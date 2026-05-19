@@ -34,6 +34,7 @@ import { ChordSearch } from "@/components/ChordSearch";
 import { ProgressionEditor } from "@/components/ProgressionEditor";
 import { ChordDictionaryPage } from "@/components/ChordDictionaryPage";
 import { ArpeggioDictionaryPage } from "@/components/ArpeggioDictionaryPage";
+import { ScaleDictionaryPage } from "@/components/ScaleDictionaryPage";
 import { ExercisesTab } from "@/components/ExercisesTab";
 import { ProfileTab } from "@/components/ProfileTab";
 import { CommunityTab } from "@/components/CommunityTab";
@@ -77,6 +78,7 @@ type AppTab =
   | "improvisation"
   | "dictionary"
   | "arpeggio"
+  | "scales"
   | "exercises"
   | "plan"
   | "community"
@@ -111,7 +113,9 @@ function ChordGenerator() {
       const nextPage =
         creation.type === "progression" && creation.payload?.mode === "improvisation"
           ? "improvisation"
-          : pageByType[creation.type];
+          : creation.type === "dictionary" && creation.payload?.mode === "scales"
+            ? "scales"
+            : pageByType[creation.type];
       setOpenedCreation(creation);
       setActivePage(nextPage);
       setSidebarOpen(false);
@@ -909,6 +913,12 @@ function ChordGenerator() {
               sub: "Arpejos por região",
             },
             {
+              page: "scales" as const,
+              icon: <BookOpen className="h-4 w-4 text-emerald-600" />,
+              label: "Dicionário de Escalas",
+              sub: "Escalas por acorde",
+            },
+            {
               page: "progression" as const,
               icon: <Music2 className="h-4 w-4" />,
               label: "Sequências Harmônicas",
@@ -1014,7 +1024,9 @@ function ChordGenerator() {
                           ? "Meu Perfil"
                           : activePage === "arpeggio"
                             ? "Dicionário de Arpejos"
-                            : "Dicionário de Acordes"}
+                            : activePage === "scales"
+                              ? "Dicionário de Escalas"
+                              : "Dicionário de Acordes"}
           </h1>
           <UserMenu />
         </header>
@@ -1128,6 +1140,32 @@ function ChordGenerator() {
                 primaryColor={primaryColor}
                 onInstrumentChange={handleInstrumentChange}
               />
+            ) : activePage === "scales" ? (
+              <>
+                <ScaleDictionaryPage
+                  instrument={instrument}
+                  stringCount={stringCount}
+                  stringNames={stringNames}
+                  markerColor={markerColor}
+                  primaryColor={primaryColor}
+                  onInstrumentChange={handleInstrumentChange}
+                  openedCreation={
+                    openedCreation?.type === "dictionary" && openedCreation.payload?.mode === "scales"
+                      ? openedCreation
+                      : null
+                  }
+                />
+                {openedCreation?.visibility === "public" &&
+                  openedCreation.type === "dictionary" &&
+                  openedCreation.payload?.mode === "scales" &&
+                  "likesCount" in openedCreation && (
+                    <CreationSocialPanel
+                      creation={openedCreation}
+                      showComposer
+                      onStatsChange={updateOpenedCommunityCreation}
+                    />
+                  )}
+              </>
             ) : activePage === "exercises" ? (
               <>
                 <ExercisesTab openedCreation={openedCreation} />

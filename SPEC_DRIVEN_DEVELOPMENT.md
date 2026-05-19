@@ -73,6 +73,7 @@ src/components
   ProgressionAudio.tsx
   ProgressionEditor.tsx
   ProgressionGrid.tsx
+  ScaleDictionaryPage.tsx
   UserMenu.tsx
   VoicingMiniSvg.tsx
   WelcomeTour.tsx
@@ -87,6 +88,7 @@ src/lib
   harmony.ts
   music-theory.ts
   progression.ts
+  scale-search.ts
   supabase.ts
   voicing-search.ts
 
@@ -174,6 +176,7 @@ Tabs atuais:
 
 - `dictionary`: Dicionario Interativo.
 - `arpeggio`: Dicionario de Arpejos.
+- `scales`: Dicionario de Escalas.
 - `progression`: Sequencias Harmonicas.
 - `improvisation`: Improvisacao.
 - `diagram`: Criador de Diagramas.
@@ -287,6 +290,7 @@ Pontos tecnicos:
 - `app.tsx` concentra muita logica de shell e do criador de diagramas.
 - Ao abrir criacao, `dictionary`, `progression` e `exercise` sao roteados para suas ferramentas correspondentes; ainda nao ha tipo persistido separado para arpejos.
 - A aba `improvisation` reaproveita `ProgressionEditor` em modo proprio e nao possui tipo de criacao separado.
+- A aba `scales` fica abaixo de arpejos na sidebar e usa `shapes_escalas.json` como dicionario de escalas.
 
 ## 8. Dicionario Interativo
 
@@ -350,7 +354,37 @@ Observacoes:
 - `ArpeggioDictionary.tsx` permanece como componente secundario/legado para a mesma familia de funcionalidade.
 - Criacoes de arpejo ainda nao possuem `SavedCreation.type` proprio; quando necessario, a comunidade classifica arpejos por conteudo de exercicio.
 
-## 10. Parser Musical
+## 10. Dicionario De Escalas
+
+Arquivos:
+
+- `src/components/ScaleDictionaryPage.tsx`
+- `src/lib/scale-search.ts`
+- `diagramas/Shapes e arpejos/shapes_escalas.json`
+- `src/components/VoicingMiniSvg.tsx`
+- `src/components/DiagramLegend.tsx`
+
+Funcionalidades atuais:
+
+- Aba propria em `/app`: `scales`.
+- Entrada na sidebar logo abaixo de `Dicionario de Arpejos`.
+- Busca por acorde/qualidade, por exemplo `C7M`.
+- `parseChord` identifica raiz e qualidade do acorde.
+- `scale-search.ts` cruza a qualidade/intervalos do acorde com escalas compativeis.
+- Cada escala encontrada mostra notas e shapes por regiao do braco.
+- O mini-diagrama usa `VoicingMiniSvg` em `renderMode="arpeggio"` para desenhar varias notas por corda, com cor verde para escala e fundamental em vermelho.
+
+Fonte de dados:
+
+- O arquivo `diagramas/Shapes e arpejos/shapes_escalas.json` define regioes do braco, nomes de escala, intervalos e qualidades de acorde compativeis.
+- Para `C7M`, o resultado esperado inclui opcoes compativeis com acordes maiores/7M, como maior, lidia e pentatonica maior.
+
+Observacoes:
+
+- Ainda nao ha salvamento/publicacao propria para escalas.
+- Se o dicionario crescer com shapes manuais especificos, manter o mesmo contrato de `regions` e `scales`.
+
+## 11. Parser Musical
 
 Arquivo: `src/lib/music-theory.ts`.
 
@@ -380,7 +414,7 @@ Pontos tecnicos:
 - `parseQualityModular` cobre combinacoes nao listadas diretamente.
 - `parseChord` converte notacoes como `11#` para `#11` e `-` para menor ou bemol conforme contexto.
 
-## 11. Busca E Encadeamento De Voicings
+## 12. Busca E Encadeamento De Voicings
 
 Arquivos:
 
@@ -416,7 +450,7 @@ Arquivos:
 - No primeiro acorde prefere posicao baixa.
 - Nos proximos acordes escolhe menor movimento em relacao ao shape anterior.
 
-## 12. Sequencias Harmonicas
+## 13. Sequencias Harmonicas
 
 Arquivos:
 
@@ -480,7 +514,7 @@ Comportamento atual:
 - `VoicingMiniSvg` aceita `renderMode`: `combined`, `chord` ou `arpeggio`.
 - A estrutura foi preparada para futuramente adicionar pentatonica e diatonica como novas opcoes de improviso ao redor do acorde.
 
-## 13. Audio E Ritmo
+## 14. Audio E Ritmo
 
 Arquivos:
 
@@ -511,7 +545,7 @@ Estado atual:
 - `PercussionPlayers` cria seus proprios elementos `Audio`, pausa e limpa `src` no unmount para nao deixar batucada tocando ao trocar de tela.
 - `ProgressionAudio.tsx` existe como painel mais completo de modos (`both`, `harmony`, `percussion`), mas nao esta ligado atualmente no `ProgressionEditor`.
 
-## 14. Criador De Diagramas
+## 15. Criador De Diagramas
 
 Arquivo principal: `src/routes/app.tsx`.
 
@@ -547,7 +581,7 @@ Regra importante de orientacao:
 - A ordem visual das cordas e invertida para preservar a afinacao correta de baixo para cima: `DGBD`.
 - Essa regra evita o erro de mostrar `DBGD` quando o braco esta deitado.
 
-## 15. Exercicios, Escalas E Arpejos
+## 16. Exercicios, Escalas E Arpejos
 
 Arquivo: `src/components/ExercisesTab.tsx`.
 
@@ -576,7 +610,7 @@ Direcao de produto:
 - Integrar com sequencias e dicionario para treino contextual.
 - Integrar com metronomo/batucada.
 
-## 16. Comunidade
+## 17. Comunidade
 
 Arquivos:
 
@@ -645,7 +679,7 @@ SQL esta em:
 supabase-community-creations.sql
 ```
 
-## 17. Salvamento Privado
+## 18. Salvamento Privado
 
 Arquivo: `src/lib/creations.ts`.
 
@@ -677,7 +711,7 @@ Consequencias:
 
 Para sincronizar privado entre dispositivos no futuro, criar tabela `user_creations` no Supabase.
 
-## 18. Deploy
+## 19. Deploy
 
 Arquivo: `.github/workflows/deploy.yml`.
 
@@ -717,7 +751,7 @@ Preferencia operacional do projeto:
 - Ao finalizar alteracoes, commitar e enviar para GitHub.
 - O deploy de producao acontece pelo workflow apos o push em `main`.
 
-## 19. Configuracoes Externas Necessarias
+## 20. Configuracoes Externas Necessarias
 
 ### GitHub Secrets
 
@@ -762,7 +796,7 @@ Necessario para perfis:
 - Tabela `profiles`.
 - Bucket `avatars`, se avatar for usado.
 
-## 20. Design System
+## 21. Design System
 
 Arquivo global: `src/styles.css`.
 
@@ -780,7 +814,7 @@ Direcao visual atual:
 - A landing page tem identidade visual propria, com fontes `Bowlby One`, `Anton` e `DM Sans`, sombras fortes e alto contraste.
 - Alteracoes visuais da landing nao devem vazar para o app interno sem decisao explicita.
 
-## 21. Requisitos Funcionais
+## 22. Requisitos Funcionais
 
 ### RF-001 Autenticacao
 
@@ -806,47 +840,51 @@ O usuario deve poder buscar acordes e visualizar posicoes.
 
 O usuario deve poder buscar arpejos por acorde/regiao e visualizar as notas no diagrama.
 
-### RF-007 Sequencias harmonicas
+### RF-007 Dicionario de escalas
+
+O usuario deve poder digitar um acorde e visualizar escalas compativeis por regiao do braco.
+
+### RF-008 Sequencias harmonicas
 
 O usuario deve poder montar sequencias por templates ou texto livre.
 
-### RF-008 Improvisacao
+### RF-009 Improvisacao
 
 O usuario deve poder montar uma base harmonica e visualizar, para cada acorde, o shape do acorde e o arpejo correspondente.
 
-### RF-009 Encadeamento de voicings
+### RF-010 Encadeamento de voicings
 
 O sistema deve sugerir voicings com movimento reduzido entre acordes.
 
-### RF-010 Diagramas personalizados
+### RF-011 Diagramas personalizados
 
 O usuario deve poder criar e exportar diagramas em SVG/PNG.
 
-### RF-011 Audio
+### RF-012 Audio
 
 O usuario deve poder praticar com metronomo, sintese harmonica e loops.
 
-### RF-012 Salvamento privado
+### RF-013 Salvamento privado
 
 O usuario deve poder salvar criacoes localmente no proprio perfil/navegador e remover itens salvos.
 
-### RF-013 Publicacao publica
+### RF-014 Publicacao publica
 
 O usuario deve poder publicar criacoes na comunidade com nickname.
 
-### RF-014 Comunidade
+### RF-015 Comunidade
 
 Usuarios autenticados devem poder visualizar criacoes publicas.
 
-### RF-015 Interacao social
+### RF-016 Interacao social
 
 Usuarios autenticados devem poder curtir e comentar publicacoes da comunidade.
 
-### RF-016 Exclusao de publicacoes proprias
+### RF-017 Exclusao de publicacoes proprias
 
 Usuarios autenticados devem poder excluir publicacoes publicas proprias.
 
-## 22. Requisitos Nao Funcionais
+## 23. Requisitos Nao Funcionais
 
 - O build de producao deve passar com `npm run build`.
 - O deploy deve ser automatico em push para `main`.
@@ -858,7 +896,7 @@ Usuarios autenticados devem poder excluir publicacoes publicas proprias.
 - O modo escuro deve cobrir shell, header, sidebar, user menu e conteudo.
 - Textos devem permanecer em UTF-8; validar com uma busca por marcadores comuns de mojibake quando houver suspeita de encoding.
 
-## 23. Contratos De Dados
+## 24. Contratos De Dados
 
 ### UserProfile
 
@@ -934,7 +972,7 @@ interface Voicing {
 }
 ```
 
-## 24. Pontos De Atencao
+## 25. Pontos De Atencao
 
 1. O salvamento privado e localStorage, nao banco.
 2. Comunidade depende da tabela `community_creations` e tabelas auxiliares de likes/comentarios.
@@ -950,7 +988,7 @@ interface Voicing {
 12. A query string `tab` define a tab inicial, mas a sidebar trabalha principalmente por estado local.
 13. A aba de improvisacao salva como `progression` com `payload.mode = "improvisation"`; se virar fluxo publico proprio, criar tipo dedicado.
 
-## 25. Roadmap Tecnico Recomendado
+## 26. Roadmap Tecnico Recomendado
 
 ### Curto prazo
 
@@ -977,7 +1015,7 @@ interface Voicing {
 - Ranking ou curadoria de sequencias.
 - Biblioteca de repertorio/musicas.
 
-## 26. Checklist Antes De Alterar O Projeto
+## 27. Checklist Antes De Alterar O Projeto
 
 Antes de qualquer mudanca relevante:
 
@@ -989,7 +1027,7 @@ Antes de qualquer mudanca relevante:
 6. Evitar quebrar o deploy em `.github/workflows/deploy.yml`.
 7. Atualizar este documento se a mudanca alterar comportamento ou contrato.
 
-## 27. Definicao De Pronto
+## 28. Definicao De Pronto
 
 Uma feature esta pronta quando:
 

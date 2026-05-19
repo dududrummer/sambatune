@@ -1,0 +1,122 @@
+{
+  "regions": [
+    { "id": "open", "label": "Regiao aberta", "startFret": 0, "endFret": 4 },
+    { "id": "low", "label": "Regiao baixa", "startFret": 3, "endFret": 7 },
+    { "id": "mid", "label": "Regiao media", "startFret": 5, "endFret": 9 },
+    { "id": "high", "label": "Regiao alta", "startFret": 7, "endFret": 12 }
+  ],
+  "scales": [
+    {
+      "id": "major",
+      "name": "Maior (Jonio)",
+      "shortName": "Maior",
+      "intervals": [0, 2, 4, 5, 7, 9, 11],
+      "qualities": ["Maior", "Maior 7", "Maior 9", "Maior 11", "Maior 13", "Maior 6", "Maior 6/9", "Add9"]
+    },
+    {
+      "id": "lydian",
+      "name": "Lidia",
+      "shortName": "Lidia",
+      "intervals": [0, 2, 4, 6, 7, 9, 11],
+      "qualities": ["Maior", "Maior 7", "Maior 9", "Maior 7(#11)", "Maior 9(#11)", "Maior 7M #5", "Maior 7M b5"]
+    },
+    {
+      "id": "major-pentatonic",
+      "name": "Pentatonica Maior",
+      "shortName": "Penta Maior",
+      "intervals": [0, 2, 4, 7, 9],
+      "qualities": ["Maior", "Maior 7", "Maior 9", "Maior 6", "Maior 6/9", "Add9"]
+    },
+    {
+      "id": "mixolydian",
+      "name": "Mixolidia",
+      "shortName": "Mixolidia",
+      "intervals": [0, 2, 4, 5, 7, 9, 10],
+      "qualities": ["Dominante 7", "Dominante 9", "Dominante 11", "Dominante 13", "Dominante 7 Sus4", "Dominante 9 Sus4", "Dominante 13 Sus4"]
+    },
+    {
+      "id": "lydian-dominant",
+      "name": "Lidia Dominante",
+      "shortName": "Lidia Dom.",
+      "intervals": [0, 2, 4, 6, 7, 9, 10],
+      "qualities": ["Dominante 7", "Dominante 9", "Dominante 13", "Dominante 7(#11)", "Dominante 9(#11)", "Dominante 13(#11)"]
+    },
+    {
+      "id": "altered",
+      "name": "Alterada",
+      "shortName": "Alterada",
+      "intervals": [0, 1, 3, 4, 6, 8, 10],
+      "qualities": ["Dominante 7 Alt", "Dominante 7(b9)", "Dominante 7(#9)", "Dominante 7(b9b13)", "Dominante 7(#9b13)", "Dominante 7(#5b9)", "Dominante 7(#5#9)", "Dominante 9(b13)"]
+    },
+    {
+      "id": "dominant-diminished",
+      "name": "Dominante Diminuta",
+      "shortName": "Dom. Dim.",
+      "intervals": [0, 1, 3, 4, 6, 7, 9, 10],
+      "qualities": ["Dominante 7", "Dominante 7(b9)", "Dominante 13(b9)"]
+    },
+    {
+      "id": "whole-tone",
+      "name": "Tons Inteiros",
+      "shortName": "Tons Int.",
+      "intervals": [0, 2, 4, 6, 8, 10],
+      "qualities": ["Aumentado", "Maior #5", "Dominante 7(#5)", "Dominante 7(#5b9)", "Dominante 7(#5#9)"]
+    },
+    {
+      "id": "natural-minor",
+      "name": "Menor Natural",
+      "shortName": "Menor Nat.",
+      "intervals": [0, 2, 3, 5, 7, 8, 10],
+      "qualities": ["Menor", "Menor 7", "Menor 9", "Menor 11", "Menor 13"]
+    },
+    {
+      "id": "dorian",
+      "name": "Dorica",
+      "shortName": "Dorica",
+      "intervals": [0, 2, 3, 5, 7, 9, 10],
+      "qualities": ["Menor", "Menor 7", "Menor 9", "Menor 11", "Menor 13", "Menor 6", "Menor 6/9"]
+    },
+    {
+      "id": "harmonic-minor",
+      "name": "Menor Harmonica",
+      "shortName": "Menor Harm.",
+      "intervals": [0, 2, 3, 5, 7, 8, 11],
+      "qualities": ["Menor", "Menor com Maior 7", "Menor com Maior 9"]
+    },
+    {
+      "id": "melodic-minor",
+      "name": "Menor Melodica",
+      "shortName": "Menor Mel.",
+      "intervals": [0, 2, 3, 5, 7, 9, 11],
+      "qualities": ["Menor", "Menor com Maior 7", "Menor com Maior 9", "Menor 6", "Menor 6/9"]
+    },
+    {
+      "id": "minor-pentatonic",
+      "name": "Pentatonica Menor",
+      "shortName": "Penta Menor",
+      "intervals": [0, 3, 5, 7, 10],
+      "qualities": ["Menor", "Menor 7", "Menor 9", "Menor 11"]
+    },
+    {
+      "id": "minor-blues",
+      "name": "Blues Menor",
+      "shortName": "Blues Menor",
+      "intervals": [0, 3, 5, 6, 7, 10],
+      "qualities": ["Menor", "Menor 7", "Menor 9", "Menor 11"]
+    },
+    {
+      "id": "locrian",
+      "name": "Locria",
+      "shortName": "Locria",
+      "intervals": [0, 1, 3, 5, 6, 8, 10],
+      "qualities": ["Menor 7b5 (ø)", "Menor b5"]
+    },
+    {
+      "id": "diminished",
+      "name": "Diminuta",
+      "shortName": "Diminuta",
+      "intervals": [0, 2, 3, 5, 6, 8, 9, 11],
+      "qualities": ["Diminuto", "Diminuto 7"]
+    }
+  ]
+}

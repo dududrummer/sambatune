@@ -80,7 +80,8 @@ export function VoicingMiniSvg({
           }
           const rel = fret - sf + 1;
           if (rel < 1 || rel > FRETS) return null;
-          return <circle key={`arp-${fret}-${s}`} cx={sx(s)} cy={mt + (rel - 0.5) * fretH} r={r} fill={arpeggioColor} />;
+          const isRoot = s === voicing.rootString && fret === voicing.rootFret;
+          return <circle key={`arp-${fret}-${s}`} cx={sx(s)} cy={mt + (rel - 0.5) * fretH} r={r} fill={isRoot ? rootColor : arpeggioColor} />;
         });
       })}
       {/* Markers (Chord Notes) */}

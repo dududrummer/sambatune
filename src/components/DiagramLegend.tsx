@@ -4,9 +4,15 @@
  */
 interface Props {
   showArpeggio?: boolean;
+  arpeggioLabel?: string;
+  arpeggioColor?: string;
 }
 
-export function DiagramLegend({ showArpeggio = true }: Props) {
+export function DiagramLegend({
+  showArpeggio = true,
+  arpeggioLabel = 'Arpejo',
+  arpeggioColor = '#f97316',
+}: Props) {
   return (
     <div className="flex items-center gap-3 text-[10px] text-muted-foreground select-none">
       <span className="flex items-center gap-1">
@@ -26,13 +32,13 @@ export function DiagramLegend({ showArpeggio = true }: Props) {
           <span
             style={{
               display: 'inline-block',
-              width: 10, height: 10,
-              borderRadius: '50%',
-              background: '#f97316',
-              flexShrink: 0,
-            }}
-          />
-          Arpejo
+            width: 10, height: 10,
+            borderRadius: '50%',
+            background: arpeggioColor,
+            flexShrink: 0,
+          }}
+        />
+          {arpeggioLabel}
         </span>
       )}
       <span className="flex items-center gap-1">
