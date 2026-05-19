@@ -19,6 +19,7 @@ import {
   GraduationCap,
   Users,
   User,
+  Sparkles,
 } from "lucide-react";
 import { CavaquinhoIcon } from "@/components/icons/CavaquinhoIcon";
 import { Button } from "@/components/ui/button";
@@ -73,6 +74,7 @@ export const Route = createFileRoute("/app")({
 type AppTab =
   | "diagram"
   | "progression"
+  | "improvisation"
   | "dictionary"
   | "arpeggio"
   | "exercises"
@@ -106,7 +108,10 @@ function ChordGenerator() {
         progression: "progression",
         exercise: "exercises",
       };
-      const nextPage = pageByType[creation.type];
+      const nextPage =
+        creation.type === "progression" && creation.payload?.mode === "improvisation"
+          ? "improvisation"
+          : pageByType[creation.type];
       setOpenedCreation(creation);
       setActivePage(nextPage);
       setSidebarOpen(false);
@@ -910,6 +915,12 @@ function ChordGenerator() {
               sub: "Sequências populares",
             },
             {
+              page: "improvisation" as const,
+              icon: <Sparkles className="h-4 w-4 text-orange-500" />,
+              label: "Improvisação",
+              sub: "Acordes e arpejos",
+            },
+            {
               page: "diagram" as const,
               icon: <CavaquinhoIcon className="h-4 w-4" />,
               label: "Criador de Diagramas",
@@ -991,17 +1002,19 @@ function ChordGenerator() {
               ? "Criador de Diagramas"
               : activePage === "progression"
                 ? "Sequências Harmônicas"
-                : activePage === "exercises"
-                  ? "Exercícios"
-                  : activePage === "plan"
-                    ? "Plano de Estudos"
-                    : activePage === "community"
-                      ? "Comunidade"
-                      : activePage === "profile"
-                        ? "Meu Perfil"
-                        : activePage === "arpeggio"
-                          ? "Dicionário de Arpejos"
-                          : "Dicionário de Acordes"}
+                : activePage === "improvisation"
+                  ? "Improvisação"
+                  : activePage === "exercises"
+                    ? "Exercícios"
+                    : activePage === "plan"
+                      ? "Plano de Estudos"
+                      : activePage === "community"
+                        ? "Comunidade"
+                        : activePage === "profile"
+                          ? "Meu Perfil"
+                          : activePage === "arpeggio"
+                            ? "Dicionário de Arpejos"
+                            : "Dicionário de Acordes"}
           </h1>
           <UserMenu />
         </header>
@@ -1049,6 +1062,34 @@ function ChordGenerator() {
                 />
                 {openedCreation?.visibility === "public" &&
                   openedCreation.type === "progression" &&
+                  "likesCount" in openedCreation && (
+                    <CreationSocialPanel
+                      creation={openedCreation}
+                      showComposer
+                      onStatsChange={updateOpenedCommunityCreation}
+                    />
+                  )}
+              </>
+            ) : activePage === "improvisation" ? (
+              <>
+                <ProgressionEditor
+                  mode="improvisation"
+                  instrument={instrument}
+                  stringCount={stringCount}
+                  stringNames={stringNames}
+                  markerColor={markerColor}
+                  primaryColor={primaryColor}
+                  onInstrumentChange={handleInstrumentChange}
+                  openedCreation={
+                    openedCreation?.type === "progression" &&
+                    openedCreation.payload?.mode === "improvisation"
+                      ? openedCreation
+                      : null
+                  }
+                />
+                {openedCreation?.visibility === "public" &&
+                  openedCreation.type === "progression" &&
+                  openedCreation.payload?.mode === "improvisation" &&
                   "likesCount" in openedCreation && (
                     <CreationSocialPanel
                       creation={openedCreation}

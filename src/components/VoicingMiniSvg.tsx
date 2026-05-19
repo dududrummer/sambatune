@@ -7,6 +7,7 @@ interface Props {
   primaryColor?: string;
   arpeggioColor?: string;
   rootColor?: string;
+  renderMode?: 'combined' | 'chord' | 'arpeggio';
   width?: number;
   height?: number;
 }
@@ -14,6 +15,7 @@ interface Props {
 export function VoicingMiniSvg({
   voicing, stringCount,
   markerColor = '#000', primaryColor = '#000', arpeggioColor = '#f97316', rootColor = '#dc2626',
+  renderMode = 'combined',
   width = 64, height = 110,
 }: Props) {
   const ml = 13, mr = 13, mt = 14, mb = 5;
@@ -25,7 +27,7 @@ export function VoicingMiniSvg({
   const pressedFrets = voicing.frets.filter(f => f > 0);
   const maxChordFret = pressedFrets.length > 0 ? Math.max(...pressedFrets) : sf;
   let maxArpFret = sf;
-  if (voicing.arpeggioFrets) {
+  if (voicing.arpeggioFrets && renderMode !== 'chord') {
     for (const stringFrets of voicing.arpeggioFrets) {
       if (!stringFrets) continue;
       for (const fret of stringFrets) {
@@ -62,7 +64,7 @@ export function VoicingMiniSvg({
           fill={primaryColor} fontSize={6} fontWeight="bold">{sf}ª</text>
       )}
       {/* Barres */}
-      {voicing.barres.map((b, i) => {
+      {renderMode !== 'arpeggio' && voicing.barres.map((b, i) => {
         const rel = b.fret - sf + 1;
         if (rel < 1 || rel > FRETS) return null;
         const cy = mt + (rel - 0.5) * fretH;
@@ -70,7 +72,7 @@ export function VoicingMiniSvg({
           width={sx(b.endString) - sx(b.startString) + r * 2} height={r * 2} rx={r} fill={markerColor} />;
       })}
       {/* Arpeggio Notes (Drawn under base chord) */}
-      {voicing.arpeggioFrets && voicing.arpeggioFrets.map((stringFrets, s) => {
+      {renderMode !== 'chord' && voicing.arpeggioFrets && voicing.arpeggioFrets.map((stringFrets, s) => {
         if (!stringFrets) return null;
         return stringFrets.map((fret) => {
           if (fret === 0) {
@@ -82,7 +84,7 @@ export function VoicingMiniSvg({
         });
       })}
       {/* Markers (Chord Notes) */}
-      {voicing.frets.map((fret, s) => {
+      {renderMode !== 'arpeggio' && voicing.frets.map((fret, s) => {
         if (fret === -1) return (
           <text key={s} x={sx(s)} y={mt - 4} textAnchor="middle" fill={primaryColor} fontSize={7} fontWeight="bold">✕</text>
         );

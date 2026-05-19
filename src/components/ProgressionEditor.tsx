@@ -14,7 +14,14 @@ import {
 import { parseProgression, uniqueChords, type Measure } from "@/lib/progression";
 import { analyseProgression, type HarmonicAnalysis } from "@/lib/harmony";
 import { INSTRUMENT_PRESETS } from "@/lib/music-theory";
-import { resolveAutoVoicings, searchVoicings } from "@/lib/voicing-search";
+import {
+  resolveAutoVoicings as resolveChordAutoVoicings,
+  searchVoicings as searchChordVoicings,
+} from "@/lib/voicing-search";
+import {
+  resolveAutoVoicings as resolveArpeggioAutoVoicings,
+  searchVoicings as searchArpeggioVoicings,
+} from "@/lib/arpeggio-search";
 import {
   PROGRESSION_TEMPLATES,
   KEY_OPTIONS,
@@ -41,9 +48,11 @@ interface Props {
   primaryColor: string;
   onInstrumentChange?: (instrument: string) => void;
   openedCreation?: SavedCreation | null;
+  mode?: "progression" | "improvisation";
 }
 
 const PROGRESSION_DRAFT_KEY = "sambatune:progression-draft";
+const IMPROVISATION_DRAFT_KEY = "sambatune:improvisation-draft";
 
 interface ProgressionDraft {
   selectedCategory?: Category | "";
@@ -54,10 +63,10 @@ interface ProgressionDraft {
   voicings?: Record<string, StoredVoicing>;
 }
 
-function loadProgressionDraft(): ProgressionDraft {
+function loadProgressionDraft(key: string): ProgressionDraft {
   if (typeof window === "undefined") return {};
   try {
-    const raw = window.sessionStorage.getItem(PROGRESSION_DRAFT_KEY);
+    const raw = window.sessionStorage.getItem(key);
     return raw ? (JSON.parse(raw) as ProgressionDraft) : {};
   } catch {
     return {};
@@ -72,8 +81,11 @@ export function ProgressionEditor({
   primaryColor,
   onInstrumentChange,
   openedCreation,
+  mode = "progression",
 }: Props) {
-  const draft = useMemo(() => loadProgressionDraft(), []);
+  const isImprovisation = mode === "improvisation";
+  const draftKey = isImprovisation ? IMPROVISATION_DRAFT_KEY : PROGRESSION_DRAFT_KEY;
+  const draft = useMemo(() => loadProgressionDraft(draftKey), [draftKey]);
   const [selectedCategory, setSelectedCategory] = useState<Category | "">(
     draft.selectedCategory ?? "",
   );
@@ -104,7 +116,7 @@ export function ProgressionEditor({
   useEffect(() => {
     try {
       window.sessionStorage.setItem(
-        PROGRESSION_DRAFT_KEY,
+        draftKey,
         JSON.stringify({
           selectedCategory,
           selectedTemplate,
@@ -117,7 +129,7 @@ export function ProgressionEditor({
     } catch {
       // Ignore storage failures; the editor still works without draft persistence.
     }
-  }, [selectedCategory, selectedTemplate, selectedKey, input, bpm, voicings]);
+  }, [selectedCategory, selectedTemplate, selectedKey, input, bpm, voicings, draftKey]);
 
   // Stop playback on unmount
   useEffect(() => {
@@ -185,7 +197,9 @@ export function ProgressionEditor({
   // Auto-voicing
   useEffect(() => {
     const tuning = getActiveTuning();
-    const auto = resolveAutoVoicings(chordNames, { instrument, tuning });
+    const auto = isImprovisation
+      ? resolveArpeggioAutoVoicings(chordNames, { instrument, tuning })
+      : resolveChordAutoVoicings(chordNames, { instrument, tuning });
     setVoicings((prev) => {
       const next: Record<string, StoredVoicing> = {};
       for (const name of chordNames) {
@@ -193,13 +207,15 @@ export function ProgressionEditor({
       }
       return next;
     });
-  }, [chordNames, instrument, getActiveTuning]);
+  }, [chordNames, instrument, getActiveTuning, isImprovisation]);
 
   const getVoicingsForChord = useCallback(
     (chordName: string): Voicing[] => {
-      return searchVoicings(chordName, { instrument, tuning: getActiveTuning() });
+      return isImprovisation
+        ? searchArpeggioVoicings(chordName, { instrument, tuning: getActiveTuning() })
+        : searchChordVoicings(chordName, { instrument, tuning: getActiveTuning() });
     },
-    [getActiveTuning, instrument],
+    [getActiveTuning, instrument, isImprovisation],
   );
 
   const handleVoicingSelect = useCallback(
@@ -217,12 +233,19 @@ export function ProgressionEditor({
   const availableKeys = KEY_OPTIONS.filter((k) =>
     selectedCategory ? k.isMinor === isMinorCategory : true,
   );
+  const title = isImprovisation ? "Improvisação" : "Sequências Harmônicas";
+  const progressionLabel = isImprovisation ? "Base harmônica" : "Progressão";
+  const defaultSaveTitle =
+    selectedTpl?.name || input || (isImprovisation ? "Meu estudo de improviso" : "Minha sequência");
+  const defaultSaveDescription = isImprovisation
+    ? "Estudo de improvisação criado no SambaTune."
+    : "Sequência harmônica criada no SambaTune.";
 
   return (
     <Card className="w-full">
       <CardHeader>
         <CardTitle className="text-lg flex items-center gap-2">
-          <Music2 className="h-5 w-5" /> Sequências Harmônicas
+          <Music2 className="h-5 w-5" /> {title}
         </CardTitle>
       </CardHeader>
       <CardContent className="space-y-4">
@@ -252,7 +275,7 @@ export function ProgressionEditor({
 
         {/* 1️⃣ Categoria — botões */}
         <div className="space-y-1.5">
-          <Label className="text-xs font-semibold">Sequências Harmônicas</Label>
+          <Label className="text-xs font-semibold">{title}</Label>
           <div className="flex flex-wrap gap-2">
             {CATEGORIES.map((cat) => (
               <button
@@ -322,7 +345,7 @@ export function ProgressionEditor({
         {/* Textarea editável */}
         <div className="space-y-1.5">
           <Label>
-            Progressão{" "}
+            {progressionLabel}{" "}
             <span className="text-xs text-muted-foreground font-normal">
               — use <code className="bg-muted px-1 rounded">|</code> para separar compassos
             </span>
@@ -347,6 +370,7 @@ export function ProgressionEditor({
           primaryColor={primaryColor}
           getVoicingsForChord={getVoicingsForChord}
           onVoicingSelect={handleVoicingSelect}
+          showImprovisationOptions={isImprovisation}
         />
 
         {measures.length > 0 && (
@@ -390,8 +414,8 @@ export function ProgressionEditor({
 
         <CreationSavePanel
           type="progression"
-          defaultTitle={selectedTpl?.name || input || "Minha sequência"}
-          defaultDescription="Sequência harmônica criada no SambaTune."
+          defaultTitle={defaultSaveTitle}
+          defaultDescription={defaultSaveDescription}
           disabled={measures.length === 0}
           payload={{
             input,
@@ -401,6 +425,7 @@ export function ProgressionEditor({
             template: selectedTemplate,
             key: selectedKey,
             voicings,
+            mode,
           }}
         />
       </CardContent>

@@ -33,6 +33,7 @@ interface Props {
   getVoicingsForChord?: (chordName: string) => Voicing[];
   /** Called when user selects a new voicing in the picker */
   onVoicingSelect?: (chordName: string, voicing: Voicing) => void;
+  showImprovisationOptions?: boolean;
 }
 
 // ── Voicing Picker Popover ──────────────────────────────────────────────────
@@ -62,6 +63,7 @@ function VoicingPicker({
             stringCount={current.tuning?.length ?? stringCount}
             markerColor={markerColor}
             primaryColor={primaryColor}
+            renderMode="chord"
             width={58}
             height={104}
           />
@@ -99,6 +101,7 @@ function VoicingPicker({
                     stringCount={current.tuning?.length ?? stringCount}
                     markerColor={markerColor}
                     primaryColor={primaryColor}
+                    renderMode="chord"
                     width={64}
                     height={110}
                   />
@@ -121,6 +124,7 @@ export function ProgressionGrid({
   voicings = {}, stringCount = 6,
   markerColor = '#000', primaryColor = '#000',
   getVoicingsForChord, onVoicingSelect,
+  showImprovisationOptions = false,
 }: Props) {
   const hasVoicings = Object.keys(voicings).length > 0;
 
@@ -182,7 +186,7 @@ export function ProgressionGrid({
                   return (
                     <div key={bi}
                       className={`flex-1 min-w-0 rounded border px-1.5 py-1 flex flex-col items-center ${FUNC_COLORS[color]}`}
-                      style={{ minWidth: '44px' }}
+                      style={{ minWidth: showImprovisationOptions ? '78px' : '44px' }}
                     >
                       {/* Roman numeral */}
                       {a && (
@@ -212,6 +216,7 @@ export function ProgressionGrid({
                             stringCount={voicing.tuning?.length ?? stringCount}
                             markerColor={markerColor}
                             primaryColor={primaryColor}
+                            renderMode={showImprovisationOptions ? 'chord' : 'combined'}
                             width={58}
                             height={104}
                           />
@@ -225,6 +230,23 @@ export function ProgressionGrid({
                             sem diagrama
                           </div>
                         )
+                      )}
+                      {showImprovisationOptions && voicing?.arpeggioFrets && (
+                        <div className="mt-2 rounded-md overflow-hidden bg-orange-50/90 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800">
+                          <div className="text-[8px] uppercase tracking-wide text-center font-black text-orange-700 dark:text-orange-300 pt-1">
+                            Arpejo
+                          </div>
+                          <VoicingMiniSvg
+                            voicing={voicing}
+                            stringCount={voicing.tuning?.length ?? stringCount}
+                            markerColor={markerColor}
+                            primaryColor={primaryColor}
+                            arpeggioColor="#f97316"
+                            renderMode="arpeggio"
+                            width={58}
+                            height={104}
+                          />
+                        </div>
                       )}
                       {/* Function label */}
                       {a && (

@@ -16,6 +16,7 @@ O produto combina:
 - Dicionario interativo de acordes.
 - Dicionario de arpejos por regiao do braco.
 - Editor de sequencias harmonicas com templates e encadeamento de voicings.
+- Aba de improvisacao baseada em sequencias, combinando acorde e arpejo por acorde.
 - Criador de diagramas personalizados exportaveis.
 - Construtor de exercicios.
 - Salvamento privado local por usuario, com exclusao pela UI.
@@ -174,6 +175,7 @@ Tabs atuais:
 - `dictionary`: Dicionario Interativo.
 - `arpeggio`: Dicionario de Arpejos.
 - `progression`: Sequencias Harmonicas.
+- `improvisation`: Improvisacao.
 - `diagram`: Criador de Diagramas.
 - `exercises`: Escalas e Arpejos.
 - `plan`: Plano de Estudos.
@@ -284,6 +286,7 @@ Pontos tecnicos:
 
 - `app.tsx` concentra muita logica de shell e do criador de diagramas.
 - Ao abrir criacao, `dictionary`, `progression` e `exercise` sao roteados para suas ferramentas correspondentes; ainda nao ha tipo persistido separado para arpejos.
+- A aba `improvisation` reaproveita `ProgressionEditor` em modo proprio e nao possui tipo de criacao separado.
 
 ## 8. Dicionario Interativo
 
@@ -463,6 +466,19 @@ Categorias atuais:
 - Menores.
 - Dissonante Maior.
 - Dissonante Menor.
+
+### Modo Improvisacao
+
+A aba `improvisation` usa o mesmo `ProgressionEditor`, com `mode="improvisation"`.
+
+Comportamento atual:
+
+- Mantem selecao de categoria, sequencia, tom, input livre, analise harmonica, playback e loops.
+- Usa rascunho proprio em `sessionStorage`: `sambatune:improvisation-draft`.
+- Usa `src/lib/arpeggio-search.ts` para resolver os voicings, anexando `arpeggioFrets`.
+- Cada acorde na grade mostra o shape do acorde e uma segunda miniatura rotulada `Arpejo`.
+- `VoicingMiniSvg` aceita `renderMode`: `combined`, `chord` ou `arpeggio`.
+- A estrutura foi preparada para futuramente adicionar pentatonica e diatonica como novas opcoes de improviso ao redor do acorde.
 
 ## 13. Audio E Ritmo
 
@@ -794,35 +810,39 @@ O usuario deve poder buscar arpejos por acorde/regiao e visualizar as notas no d
 
 O usuario deve poder montar sequencias por templates ou texto livre.
 
-### RF-008 Encadeamento de voicings
+### RF-008 Improvisacao
+
+O usuario deve poder montar uma base harmonica e visualizar, para cada acorde, o shape do acorde e o arpejo correspondente.
+
+### RF-009 Encadeamento de voicings
 
 O sistema deve sugerir voicings com movimento reduzido entre acordes.
 
-### RF-009 Diagramas personalizados
+### RF-010 Diagramas personalizados
 
 O usuario deve poder criar e exportar diagramas em SVG/PNG.
 
-### RF-010 Audio
+### RF-011 Audio
 
 O usuario deve poder praticar com metronomo, sintese harmonica e loops.
 
-### RF-011 Salvamento privado
+### RF-012 Salvamento privado
 
 O usuario deve poder salvar criacoes localmente no proprio perfil/navegador e remover itens salvos.
 
-### RF-012 Publicacao publica
+### RF-013 Publicacao publica
 
 O usuario deve poder publicar criacoes na comunidade com nickname.
 
-### RF-013 Comunidade
+### RF-014 Comunidade
 
 Usuarios autenticados devem poder visualizar criacoes publicas.
 
-### RF-014 Interacao social
+### RF-015 Interacao social
 
 Usuarios autenticados devem poder curtir e comentar publicacoes da comunidade.
 
-### RF-015 Exclusao de publicacoes proprias
+### RF-016 Exclusao de publicacoes proprias
 
 Usuarios autenticados devem poder excluir publicacoes publicas proprias.
 
@@ -928,6 +948,7 @@ interface Voicing {
 10. `ProgressionAudio.tsx` existe, mas nao esta conectado ao fluxo principal.
 11. A aba de arpejos ainda nao tem tipo proprio em `SavedCreation`; isso limita abertura/classificacao de criacoes especificas de arpejo.
 12. A query string `tab` define a tab inicial, mas a sidebar trabalha principalmente por estado local.
+13. A aba de improvisacao salva como `progression` com `payload.mode = "improvisation"`; se virar fluxo publico proprio, criar tipo dedicado.
 
 ## 25. Roadmap Tecnico Recomendado
 
@@ -937,6 +958,7 @@ interface Voicing {
 - Adicionar fluxo real de recuperacao de senha.
 - Melhorar mensagens de erro de Supabase na publicacao.
 - Criar tipo proprio para criacoes de arpejo, se a aba de arpejos passar a salvar/publicar diretamente.
+- Criar tipo proprio para estudos de improvisacao, se a aba passar a publicar conteudo independente.
 - Revisar imports/componentes legados da area de arpejos.
 
 ### Medio prazo
