@@ -216,8 +216,10 @@ export function searchVoicings(
   const qKey = QUALITY_MAP[parsed.qualityName];
   const shapes: any[] = qKey !== undefined ? (shapeDictRaw as Record<string, any[]>)[qKey] || [] : [];
 
-  if (shapes.length > 0) {
-    finalVoicings = finalVoicings.map(v => {
+  finalVoicings = finalVoicings.map(v => {
+    let bestArp: number[][] | null = null;
+
+    if (shapes.length > 0) {
       const dir = chordDirection(v);
 
       // Resolve root anchor: prefer voicing's detected root, else estimate from startingFret
@@ -242,7 +244,6 @@ export function searchVoicings(
         ];
       }
 
-      let bestArp: number[][] | null = null;
       let minDiff = 999;
 
       for (const shape of pool) {
@@ -260,11 +261,28 @@ export function searchVoicings(
         if (diff < minDiff) { minDiff = diff; bestArp = arpeggioFrets; }
         if (bestArp) break;
       }
+    }
 
-      if (bestArp) return { ...v, arpeggioFrets: bestArp };
-      return v;
-    });
-  }
+    if (!bestArp) {
+      // Fallback arpeggio: build from chord frets and mirror strings 0 and 3 (the D strings)
+      const fallbackArp: number[][] = [[], [], [], []];
+      const dFrets = new Set<number>();
+      
+      if (v.frets[0] >= 0) dFrets.add(v.frets[0]);
+      if (v.frets[3] >= 0) dFrets.add(v.frets[3]);
+      
+      const dArr = Array.from(dFrets).sort((a, b) => a - b);
+      
+      fallbackArp[0] = [...dArr];
+      if (v.frets[1] >= 0) fallbackArp[1] = [v.frets[1]];
+      if (v.frets[2] >= 0) fallbackArp[2] = [v.frets[2]];
+      fallbackArp[3] = [...dArr];
+      
+      bestArp = fallbackArp;
+    }
+
+    return { ...v, arpeggioFrets: bestArp };
+  });
 
   return finalVoicings;
 }
