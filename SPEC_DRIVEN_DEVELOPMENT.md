@@ -1,12 +1,12 @@
 # SambaTune - Spec Driven Development
 
-Ultima revisao: 2026-05-17
+Ultima revisao: 2026-05-19
 
-Este documento descreve o que o SambaTune faz, como o projeto esta organizado e quais contratos tecnicos devem ser preservados em evolucoes futuras. Ele deve ser usado como referencia antes de implementar novas features, refatoracoes ou alteracoes de produto.
+Este documento descreve o estado atual do SambaTune, como o projeto esta organizado e quais contratos tecnicos devem ser preservados em evolucoes futuras. Use como referencia antes de implementar novas features, refatoracoes ou alteracoes de produto.
 
 ## 1. Visao Do Produto
 
-SambaTune e uma aplicacao web para estudo de cavaquinho e banjo com foco em samba, pagode, sequencias harmonicas, dicionario de acordes, diagramas personalizados, treino com ritmo e comunidade.
+SambaTune e uma aplicacao web para estudo de cavaquinho e banjo com foco em samba, pagode, sequencias harmonicas, dicionario de acordes, arpejos por regiao, diagramas personalizados, treino com ritmo e comunidade.
 
 O produto combina:
 
@@ -14,11 +14,13 @@ O produto combina:
 - Area autenticada em `/app` para ferramentas musicais.
 - Autenticacao via Supabase.
 - Dicionario interativo de acordes.
+- Dicionario de arpejos por regiao do braco.
 - Editor de sequencias harmonicas com templates e encadeamento de voicings.
 - Criador de diagramas personalizados exportaveis.
 - Construtor de exercicios.
-- Salvamento privado local por usuario.
+- Salvamento privado local por usuario, com exclusao pela UI.
 - Publicacao publica na comunidade via Supabase.
+- Exclusao de publicacoes proprias na comunidade.
 - Abertura de criacoes salvas/publicadas de volta na ferramenta de origem.
 - Curtidas e comentarios publicos em criacoes da comunidade.
 - Playback de sequencias com sintetizador, metronomo e loops de percussao.
@@ -57,22 +59,27 @@ src/routes
   app.tsx         Aplicacao autenticada
 
 src/components
+  ArpeggioDictionary.tsx
+  ArpeggioDictionaryPage.tsx
   ChordDictionaryPage.tsx
   ChordSearch.tsx
   CommunityTab.tsx
   CreationSavePanel.tsx
+  DiagramLegend.tsx
   ExercisesTab.tsx
   PercussionPlayers.tsx
   ProfileTab.tsx
+  ProgressionAudio.tsx
   ProgressionEditor.tsx
   ProgressionGrid.tsx
   UserMenu.tsx
-  WelcomeTour.tsx
   VoicingMiniSvg.tsx
+  WelcomeTour.tsx
 
 src/lib
-  auth-context.tsx
+  arpeggio-search.ts
   audio.ts
+  auth-context.tsx
   chord-finder.ts
   creations.ts
   degree-progressions.ts
@@ -83,6 +90,9 @@ src/lib
   voicing-search.ts
 
 src/config
+  arpeggio-dictionary-user.json
+  arpeggio-dictionary.json
+  arpeggio-shapes.json
   audio-loops.ts
   cavaquinho-dictionary.json
   ukulele-dictionary.json
@@ -101,12 +111,15 @@ public
 
 ### `/`
 
-Landing page publica. Mostra:
+Landing page publica. O visual atual segue o modelo editorial/HQ usado como referencia em `www.cristianofigueiredo.com.br`, limitado a landing page.
 
-- Hero com proposta: acordes, arpejos, escalas, sequencias e muito mais.
-- Beneficios do dicionario interativo, sequencias, diagramas, ritmo e comunidade.
-- CTA para experimentar.
-- UserMenu no topo, mostrando botoes de login/cadastro quando deslogado.
+Mostra:
+
+- Header publico com marca e `UserMenu`.
+- Hero com wordmark SambaTune em duas cores.
+- Frase de topo: `Menos teoria solta, mais pratica organizada.`
+- Blocos comerciais sobre dicionario, sequencias, arpejos, diagramas, ritmo e comunidade.
+- CTAs para cadastro/entrada.
 
 ### `/login`
 
@@ -121,23 +134,20 @@ Fluxos:
 
 ### `/register`
 
-Tela publica de cadastro em duas etapas.
+Tela publica de cadastro em etapas.
 
-Etapa 1:
+Campos principais:
 
 - Nome completo.
 - Email.
-- Senha.
-- Confirmacao de senha.
-
-Etapa 2:
-
+- Senha e confirmacao.
 - Foto/avatar opcional.
 - Nome artistico.
 - WhatsApp.
 - Idade.
 - Sexo.
 - Instrumento principal.
+- Como conheceu o SambaTune.
 
 Regras:
 
@@ -156,11 +166,13 @@ Regras:
 - Se `isLoading`, mostra tela de carregamento.
 - Se nao autenticado, redireciona para `/`.
 - Qualquer URL direta como `/app?tab=dictionary` deve ser bloqueada sem sessao.
-- Abas controladas por query param `tab`.
+- A tab inicial pode vir de `tab` na query string.
+- A troca manual pela sidebar atualiza estado local de pagina; abertura de criacoes tambem troca a pagina de destino.
 
-Tabs:
+Tabs atuais:
 
 - `dictionary`: Dicionario Interativo.
+- `arpeggio`: Dicionario de Arpejos.
 - `progression`: Sequencias Harmonicas.
 - `diagram`: Criador de Diagramas.
 - `exercises`: Escalas e Arpejos.
@@ -203,13 +215,15 @@ Campos usados:
 - `gender`
 - `instrument`
 - `avatar_url`
+- `how_did_you_find_us`
+- `created_at`
 - `updated_at`
 
 Storage esperado:
 
 - Bucket `avatars`.
 - Upload em `avatars/{userId}.{ext}`.
-- O codigo usa URL publica do arquivo.
+- O codigo usa URL publica do arquivo quando houver avatar.
 
 Regras importantes:
 
@@ -217,6 +231,7 @@ Regras importantes:
 - `fetchProfile` usa `maybeSingle()`.
 - `logout` limpa tambem o estado local, nao depende apenas do evento do Supabase.
 - Rotas internas nao devem usar apenas UI escondida para seguranca; devem checar autenticacao.
+- `ProfileTab` edita dados basicos; o botao de upload de foto ainda nao implementa upload ali.
 
 ## 6. Landing Page
 
@@ -225,18 +240,19 @@ Arquivo: `src/routes/index.tsx`.
 Objetivo:
 
 - Apresentar SambaTune de forma comercial e convidativa.
-- Destacar sequencias de samba, dicionario interativo, diagramas, ritmo, arpejos, escalas e comunidade.
+- Destacar sequencias de samba, dicionario interativo, arpejos, diagramas, ritmo e comunidade.
 - Evitar promessa de gratuidade permanente.
-- Usar linguagem "Experimente gratis".
+- Usar linguagem de experimentacao e entrada no app.
 
-Elementos visuais:
+Elementos visuais atuais:
 
-- Estilo neobrutalista.
-- Fundo `neo-bg`.
-- Cores `neo-orange` e `neo-yellow`.
-- Hero com imagem `public/hero-cavaquinho.png?v=20260515`.
-- Circulos em marca d'agua no hero.
-- Cards com borda forte e sombra.
+- Estilo editorial/HQ inspirado na referencia `cristianofigueiredo.com.br`.
+- Fontes carregadas localmente na pagina por Google Fonts: `Bowlby One`, `Anton` e `DM Sans`.
+- Wordmark gigante: `Samba` preto com sombra laranja; `Tune` laranja com sombra preta.
+- Badge de frase com fundo laranja e sombra preta: `Menos teoria solta, mais pratica organizada.`
+- Frase complementar: `Por que funciona`.
+- Layout de alto contraste, com bordas fortes, sombras deslocadas, faixas e secoes cheias.
+- A landing possui CSS local proprio e nao deve forcar a mesma estetica para a aplicacao interna.
 
 ## 7. Aplicacao Interna
 
@@ -251,6 +267,7 @@ Responsabilidades:
 - Protecao de acesso.
 - Alternancia de abas.
 - Estado global do criador de diagramas.
+- Abertura de criacoes salvas ou publicadas.
 
 Modo escuro:
 
@@ -263,14 +280,21 @@ Alinhamento:
 - Header e topo da sidebar usam altura fixa de `72px`.
 - Bordas do topo usam a mesma espessura e variavel de tema.
 
+Pontos tecnicos:
+
+- `app.tsx` concentra muita logica de shell e do criador de diagramas.
+- Ao abrir criacao, `dictionary`, `progression` e `exercise` sao roteados para suas ferramentas correspondentes; ainda nao ha tipo persistido separado para arpejos.
+
 ## 8. Dicionario Interativo
 
 Arquivos:
 
 - `src/components/ChordDictionaryPage.tsx`
+- `src/components/VoicingMiniSvg.tsx`
+- `src/components/DiagramLegend.tsx`
+- `src/lib/arpeggio-search.ts`
 - `src/lib/voicing-search.ts`
 - `src/config/cavaquinho-dictionary.json`
-- `src/components/VoicingMiniSvg.tsx`
 
 Fluxo:
 
@@ -281,15 +305,49 @@ Fluxo:
 5. Resultados aparecem como mini diagramas.
 6. Usuario pode salvar no perfil ou publicar na comunidade.
 
+Estado atual:
+
+- A pagina de acordes usa a busca de `arpeggio-search.ts` como fonte e remove os dados de arpejo antes de renderizar diagramas de acorde.
+- `VoicingMiniSvg` renderiza a fundamental em vermelho.
+- `DiagramLegend` exibe apenas a legenda relevante para acorde quando `showArpeggio={false}`.
+
 Regras:
 
 - Instrumentos atuais: cavaquinho e banjo, ambos DGBD.
 - Dicionario real existe para cavaquinho.
 - Banjo usa a mesma afinacao e pode cair no fallback algoritmico quando nao houver dicionario especifico.
-- Se acorde esta no dicionario, `voicing-search` retorna apenas voicings do dicionario.
-- Se nao esta no dicionario, usa `findVoicings` como fallback.
+- Se acorde esta no dicionario, a busca retorna voicings do dicionario.
+- Se nao esta no dicionario, usa algoritmo de fallback.
 
-## 9. Parser Musical
+## 9. Dicionario De Arpejos
+
+Arquivos:
+
+- `src/components/ArpeggioDictionaryPage.tsx`
+- `src/components/ArpeggioDictionary.tsx`
+- `src/lib/arpeggio-search.ts`
+- `src/config/arpeggio-shapes.json`
+- `src/config/arpeggio-dictionary.json`
+- `src/config/arpeggio-dictionary-user.json`
+- `src/components/VoicingMiniSvg.tsx`
+- `src/components/DiagramLegend.tsx`
+
+Funcionalidades atuais:
+
+- Aba propria em `/app`: `arpeggio`.
+- Busca por acorde/qualidade.
+- Sugestao de shapes de acorde com notas de arpejo por regiao.
+- Suporte a direcao de arpejo (`frente`, `tras` ou neutro) conforme configuracao.
+- Legenda com fundamental vermelha, arpejo laranja e shape preto.
+- Mini diagramas expandem a regiao de trastes quando o arpejo passa do shape base.
+
+Observacoes:
+
+- `ArpeggioDictionaryPage` e a pagina atualmente ligada no shell.
+- `ArpeggioDictionary.tsx` permanece como componente secundario/legado para a mesma familia de funcionalidade.
+- Criacoes de arpejo ainda nao possuem `SavedCreation.type` proprio; quando necessario, a comunidade classifica arpejos por conteudo de exercicio.
+
+## 10. Parser Musical
 
 Arquivo: `src/lib/music-theory.ts`.
 
@@ -319,11 +377,12 @@ Pontos tecnicos:
 - `parseQualityModular` cobre combinacoes nao listadas diretamente.
 - `parseChord` converte notacoes como `11#` para `#11` e `-` para menor ou bemol conforme contexto.
 
-## 10. Busca E Encadeamento De Voicings
+## 11. Busca E Encadeamento De Voicings
 
 Arquivos:
 
 - `src/lib/voicing-search.ts`
+- `src/lib/arpeggio-search.ts`
 - `src/lib/chord-finder.ts`
 
 `findVoicings`:
@@ -336,11 +395,17 @@ Arquivos:
 - Remove duplicados.
 - Ordena por completude, cordas mudas, dedos e regiao.
 
-`searchVoicings`:
+`voicing-search.searchVoicings`:
 
 - Tenta dicionario antes do algoritmo.
 - Agrupa fallback por regioes do braco.
 - Para instrumentos pequenos permite omitir quinta/fundamental em alguns casos.
+
+`arpeggio-search.searchVoicings`:
+
+- Reaproveita a logica de voicing e adiciona dados de arpejo.
+- Usa `arpeggio-shapes.json` para mapear qualidade, corda raiz, traste raiz, direcao e frets de arpejo.
+- Possui fallback de arpejo quando nao ha shape configurado.
 
 `resolveAutoVoicings`:
 
@@ -348,12 +413,13 @@ Arquivos:
 - No primeiro acorde prefere posicao baixa.
 - Nos proximos acordes escolhe menor movimento em relacao ao shape anterior.
 
-## 11. Sequencias Harmonicas
+## 12. Sequencias Harmonicas
 
 Arquivos:
 
 - `src/components/ProgressionEditor.tsx`
 - `src/components/ProgressionGrid.tsx`
+- `src/components/PercussionPlayers.tsx`
 - `src/lib/progression.ts`
 - `src/lib/harmony.ts`
 - `src/lib/degree-progressions.ts`
@@ -374,11 +440,19 @@ Funcionalidades:
 - Playback com metronomo/sintese/loops.
 - Salvamento privado e publicacao na comunidade.
 
+Persistencia local da tela:
+
+- O rascunho da sequencia usa `sessionStorage`.
+- Chave: `sambatune:progression-draft`.
+- Guarda categoria, template, tom, input, BPM e voicings.
+- Ao desmontar a tela, `ProgressionEditor` chama `stopPlayback()` para evitar audio sintetizado tocando fora da tela.
+
 Analise harmonica:
 
 - `src/lib/harmony.ts` detecta a tonalidade antes de gerar graus romanos e funcoes.
 - A deteccao usa pontuacao hibrida: perfil Krumhansl-Schmuckler, raizes dos acordes, encaixe diatonico, qualidade esperada do grau, dominantes resolvendo e peso de primeiro/ultimo acorde.
-- A rotacao do perfil tonal deve preservar a raiz candidata como centro; progresses claras em do maior como `C | F | G | C`, `C7M | Dm7 G7 | C7M` e `C | Am | F | G` devem retornar `C maior`, nao `F maior`.
+- A rotacao do perfil tonal deve preservar a raiz candidata como centro.
+- Casos claros em do maior como `C | F | G | C`, `C7M | Dm7 G7 | C7M` e `C | Am | F | G` devem retornar `C maior`.
 - Casos de referencia: `F | Bb | C7 | F` deve retornar `F maior`; `Am | Dm | E7 | Am` deve retornar `A menor`.
 
 Categorias atuais:
@@ -390,13 +464,14 @@ Categorias atuais:
 - Dissonante Maior.
 - Dissonante Menor.
 
-## 12. Audio E Ritmo
+## 13. Audio E Ritmo
 
 Arquivos:
 
 - `src/lib/audio.ts`
 - `src/config/audio-loops.ts`
 - `src/components/PercussionPlayers.tsx`
+- `src/components/ProgressionAudio.tsx`
 - `public/audio/loops`
 
 Audio sintetizado:
@@ -405,6 +480,7 @@ Audio sintetizado:
 - PolySynth FMSynth.
 - Pad/comping harmonico por acorde.
 - Metronomo com MembraneSynth.
+- Funcoes principais: `startPlayback`, `stopPlayback`, `setBpm`, `hasLoopFor`.
 
 Loops:
 
@@ -412,18 +488,14 @@ Loops:
 - Samba-enredo.
 - Outros estilos previstos no codigo: jazz, bossanova, metronome.
 
-Modos de audio:
+Estado atual:
 
-- `harmony`
-- `percussion`
-- `both`
+- O botao principal de `ProgressionEditor` chama `startPlayback` com estilo `"metronome"` e modo `"harmony"`.
+- `PercussionPlayers` oferece players separados para loops reais de percussao.
+- `PercussionPlayers` cria seus proprios elementos `Audio`, pausa e limpa `src` no unmount para nao deixar batucada tocando ao trocar de tela.
+- `ProgressionAudio.tsx` existe como painel mais completo de modos (`both`, `harmony`, `percussion`), mas nao esta ligado atualmente no `ProgressionEditor`.
 
-Observacao:
-
-- `ProgressionEditor` atualmente chama `startPlayback` com estilo `"metronome"` no botao principal.
-- `PercussionPlayers` oferece players separados para loops.
-
-## 13. Criador De Diagramas
+## 14. Criador De Diagramas
 
 Arquivo principal: `src/routes/app.tsx`.
 
@@ -453,28 +525,42 @@ Dependencias internas:
 
 - `ChordSearch` permite buscar acorde e carregar um voicing no diagrama principal.
 
-## 14. Exercicios, Escalas E Arpejos
+Regra importante de orientacao:
+
+- Na orientacao horizontal, o traste zero/nut permanece a esquerda.
+- A ordem visual das cordas e invertida para preservar a afinacao correta de baixo para cima: `DGBD`.
+- Essa regra evita o erro de mostrar `DBGD` quando o braco esta deitado.
+
+## 15. Exercicios, Escalas E Arpejos
 
 Arquivo: `src/components/ExercisesTab.tsx`.
 
 Estado atual:
 
+- Area com abas internas: Digitacao, Acordes, Frases, Arpejos e Mecanicos.
+- Modulos de estudo ainda aparecem como conteudo em desenvolvimento.
 - Construtor simples de rotina.
-- Campos:
-  - titulo;
-  - foco;
-  - roteiro de pratica;
-  - BPM;
-  - minutos.
-- Permite salvar no perfil ou publicar na comunidade.
+
+Campos do construtor:
+
+- Titulo.
+- Foco.
+- Roteiro de pratica.
+- BPM.
+- Minutos.
+
+Fluxos:
+
+- Permite salvar no perfil.
+- Permite publicar na comunidade.
 
 Direcao de produto:
 
 - Evoluir para aplicar arpejos e escalas por regiao do acorde.
 - Integrar com sequencias e dicionario para treino contextual.
-- Integrar com metrônomo/batucada.
+- Integrar com metronomo/batucada.
 
-## 15. Comunidade
+## 16. Comunidade
 
 Arquivos:
 
@@ -499,29 +585,33 @@ Campos:
 - `author_name`
 - `created_at`
 
-Tipos:
+Tipos persistidos:
 
 - `dictionary`
 - `progression`
 - `exercise`
+
+Secoes de dashboard:
+
+- `progression`
+- `dictionary`
+- `scales`
+- `arpeggios`
 
 Fluxo:
 
 1. Usuario cria algo em Dicionario, Sequencias ou Exercicios.
 2. Pode salvar localmente no perfil.
 3. Pode publicar na comunidade.
-4. Publicacao publica usa `author_name`, derivado de:
-   - nome artistico;
-   - nome;
-   - prefixo do email;
-   - fallback "Musico".
-5. Comunidade abre em dashboard responsivo por assunto: Sequencias, Dicionario, Escalas e Arpejos.
-6. Cada cartao do dashboard mostra quantidade de publicacoes, total de curtidas, total de comentarios e publicacao mais quente da secao.
+4. Publicacao publica usa `author_name`, derivado de nome artistico, nome, prefixo do email ou fallback `Musico`.
+5. Comunidade abre em dashboard responsivo por assunto.
+6. Cada cartao mostra quantidade de publicacoes, total de curtidas, total de comentarios e publicacao mais quente da secao.
 7. Ao clicar em uma secao, a comunidade exibe as publicacoes em lista.
 8. Publicacoes de `exercise` sao exibidas como Escalas ou Arpejos conforme conteudo salvo.
 9. Usuario pode abrir uma publicacao na ferramenta de origem dentro da propria area `/app`.
 10. Ao clicar no icone de comentario, os comentarios e a caixa de resposta aparecem abaixo da publicacao.
 11. Comentarios feitos em publicacoes publicas ficam visiveis para a comunidade.
+12. Autor pode excluir suas proprias publicacoes publicas pela UI.
 
 Seguranca RLS esperada:
 
@@ -539,7 +629,7 @@ SQL esta em:
 supabase-community-creations.sql
 ```
 
-## 16. Salvamento Privado
+## 17. Salvamento Privado
 
 Arquivo: `src/lib/creations.ts`.
 
@@ -548,6 +638,19 @@ O salvamento privado usa `localStorage`, separado por usuario:
 ```txt
 sambatune_creations:{userId}
 ```
+
+Operacoes:
+
+- `loadLocalCreations(userId)`
+- `saveLocalCreation(userId, creation)`
+- `deleteLocalCreation(userId, creationId)`
+
+UI:
+
+- `CreationSavePanel` lista criacoes locais recentes do usuario.
+- A lista mostra ate quatro itens recentes.
+- Cada item pode ser aberto ou excluido.
+- A exclusao pede confirmacao por `window.confirm`.
 
 Consequencias:
 
@@ -558,7 +661,7 @@ Consequencias:
 
 Para sincronizar privado entre dispositivos no futuro, criar tabela `user_creations` no Supabase.
 
-## 17. Deploy
+## 18. Deploy
 
 Arquivo: `.github/workflows/deploy.yml`.
 
@@ -593,7 +696,12 @@ Repositorio atual:
 https://github.com/dududrummer/sambatune.git
 ```
 
-## 18. Configuracoes Externas Necessarias
+Preferencia operacional do projeto:
+
+- Ao finalizar alteracoes, commitar e enviar para GitHub.
+- O deploy de producao acontece pelo workflow apos o push em `main`.
+
+## 19. Configuracoes Externas Necessarias
 
 ### GitHub Secrets
 
@@ -638,38 +746,25 @@ Necessario para perfis:
 - Tabela `profiles`.
 - Bucket `avatars`, se avatar for usado.
 
-## 19. Design System
+## 20. Design System
 
-Arquivo: `src/styles.css`.
+Arquivo global: `src/styles.css`.
 
 Base:
 
 - Tailwind CSS v4.
 - Variaveis OKLCH.
 - Variantes dark.
-- Fontes:
-  - display: Luckiest Guy;
-  - heading: Bebas Neue;
-  - body: Inter;
-  - accent: Gochi Hand.
+- Fonte interna principal: Inter.
+- UI interna mais sobria, utilitaria e profissional.
 
-Tokens principais:
+Direcao visual atual:
 
-- `neo-bg`
-- `neo-orange`
-- `neo-yellow`
-- `neo-border`
-- `neo-shadow`
+- A aplicacao autenticada usa superficie clara/escura, botoes consistentes, sombras suaves e cards funcionais.
+- A landing page tem identidade visual propria, com fontes `Bowlby One`, `Anton` e `DM Sans`, sombras fortes e alto contraste.
+- Alteracoes visuais da landing nao devem vazar para o app interno sem decisao explicita.
 
-Direcao visual:
-
-- Neobrutalista.
-- Bordas fortes.
-- Sombras deslocadas.
-- Cards simples.
-- UI interna mais utilitaria, mas alinhada visualmente a landing.
-
-## 20. Requisitos Funcionais
+## 21. Requisitos Funcionais
 
 ### RF-001 Autenticacao
 
@@ -691,39 +786,47 @@ O usuario deve poder visualizar e editar dados basicos de perfil.
 
 O usuario deve poder buscar acordes e visualizar posicoes.
 
-### RF-006 Sequencias harmonicas
+### RF-006 Dicionario de arpejos
+
+O usuario deve poder buscar arpejos por acorde/regiao e visualizar as notas no diagrama.
+
+### RF-007 Sequencias harmonicas
 
 O usuario deve poder montar sequencias por templates ou texto livre.
 
-### RF-007 Encadeamento de voicings
+### RF-008 Encadeamento de voicings
 
 O sistema deve sugerir voicings com movimento reduzido entre acordes.
 
-### RF-008 Diagramas personalizados
+### RF-009 Diagramas personalizados
 
 O usuario deve poder criar e exportar diagramas em SVG/PNG.
 
-### RF-009 Audio
+### RF-010 Audio
 
 O usuario deve poder praticar com metronomo, sintese harmonica e loops.
 
-### RF-010 Salvamento privado
+### RF-011 Salvamento privado
 
-O usuario deve poder salvar criacoes localmente no proprio perfil/navegador.
+O usuario deve poder salvar criacoes localmente no proprio perfil/navegador e remover itens salvos.
 
-### RF-011 Publicacao publica
+### RF-012 Publicacao publica
 
 O usuario deve poder publicar criacoes na comunidade com nickname.
 
-### RF-012 Comunidade
+### RF-013 Comunidade
 
 Usuarios autenticados devem poder visualizar criacoes publicas.
 
-### RF-013 Interacao social
+### RF-014 Interacao social
 
 Usuarios autenticados devem poder curtir e comentar publicacoes da comunidade.
 
-## 21. Requisitos Nao Funcionais
+### RF-015 Exclusao de publicacoes proprias
+
+Usuarios autenticados devem poder excluir publicacoes publicas proprias.
+
+## 22. Requisitos Nao Funcionais
 
 - O build de producao deve passar com `npm run build`.
 - O deploy deve ser automatico em push para `main`.
@@ -733,8 +836,9 @@ Usuarios autenticados devem poder curtir e comentar publicacoes da comunidade.
 - Rotas privadas devem validar sessao.
 - UI deve funcionar em desktop e mobile.
 - O modo escuro deve cobrir shell, header, sidebar, user menu e conteudo.
+- Textos devem permanecer em UTF-8; validar com uma busca por marcadores comuns de mojibake quando houver suspeita de encoding.
 
-## 22. Contratos De Dados
+## 23. Contratos De Dados
 
 ### UserProfile
 
@@ -749,6 +853,7 @@ interface UserProfile {
   gender?: "male" | "female" | "other" | "prefer_not_to_say";
   instrument?: string;
   avatarUrl?: string;
+  howDidYouFindUs?: string;
   createdAt: string;
 }
 ```
@@ -803,41 +908,44 @@ interface Voicing {
   omitted: string[];
   fingerCount: number;
   isPriority?: boolean;
+  rootString?: number;
+  rootFret?: number;
+  arpeggioFrets?: Array<{ string: number; fret: number }>;
 }
 ```
 
-## 23. Pontos De Atencao
+## 24. Pontos De Atencao
 
-1. Existem textos com caracteres corrompidos/mojibake em alguns arquivos, provavelmente por encoding antigo.
-2. O salvamento privado e localStorage, nao banco.
-3. Comunidade depende da tabela `community_creations`.
-4. `profiles` e bucket `avatars` nao possuem SQL versionado neste repo.
-5. O app usa `dist/` para deploy; nao commitar `dist` se nao fizer parte do fluxo.
-6. O chunk principal esta acima de 500 kB; Vite emite warning.
-7. `ProgressionEditor` e `app.tsx` concentram muita logica e podem ser divididos futuramente.
-8. Existem dicionarios `ukulele` e `violao` no repo, mas a UI atual foca em cavaquinho/banjo.
-9. Google OAuth depende de configuracao no Supabase e Google Cloud.
-10. Recuperacao de senha aparece como link visual, mas ainda nao ha fluxo implementado.
+1. O salvamento privado e localStorage, nao banco.
+2. Comunidade depende da tabela `community_creations` e tabelas auxiliares de likes/comentarios.
+3. `profiles` e bucket `avatars` nao possuem SQL versionado neste repo.
+4. O app usa `dist/` para deploy; nao commitar `dist` se nao fizer parte do fluxo.
+5. O chunk principal esta acima de 500 kB; Vite pode emitir warning.
+6. `ProgressionEditor` e `app.tsx` concentram muita logica e podem ser divididos futuramente.
+7. Existem dicionarios `ukulele` e `violao` no repo, mas a UI atual foca em cavaquinho/banjo.
+8. Google OAuth depende de configuracao no Supabase e Google Cloud.
+9. Recuperacao de senha aparece como link visual, mas ainda nao ha fluxo implementado.
+10. `ProgressionAudio.tsx` existe, mas nao esta conectado ao fluxo principal.
+11. A aba de arpejos ainda nao tem tipo proprio em `SavedCreation`; isso limita abertura/classificacao de criacoes especificas de arpejo.
+12. A query string `tab` define a tab inicial, mas a sidebar trabalha principalmente por estado local.
 
-## 24. Roadmap Tecnico Recomendado
+## 25. Roadmap Tecnico Recomendado
 
 ### Curto prazo
 
 - Criar SQL versionado para `profiles` e bucket/policies de `avatars`.
 - Adicionar fluxo real de recuperacao de senha.
-- Permitir carregar uma criacao salva de volta na ferramenta.
-- Adicionar exclusao de criacoes privadas e publicas pela UI.
 - Melhorar mensagens de erro de Supabase na publicacao.
-- Corrigir encoding/mojibake dos arquivos.
+- Criar tipo proprio para criacoes de arpejo, se a aba de arpejos passar a salvar/publicar diretamente.
+- Revisar imports/componentes legados da area de arpejos.
 
 ### Medio prazo
 
 - Criar tabela `user_creations` para salvar privado no Supabase.
-- Adicionar curtidas/favoritos na comunidade.
-- Adicionar filtros na comunidade por tipo.
+- Adicionar filtros mais granulares na comunidade.
 - Adicionar pagina de detalhe para publicacoes.
-- Integrar exercicios diretamente com sequencias e dicionario.
-- Adicionar testes automatizados unitarios para parser musical.
+- Integrar exercicios diretamente com sequencias, dicionario e arpejos.
+- Adicionar testes automatizados unitarios para parser musical, busca de voicings e orientacao do diagrama.
 
 ### Longo prazo
 
@@ -847,7 +955,7 @@ interface Voicing {
 - Ranking ou curadoria de sequencias.
 - Biblioteca de repertorio/musicas.
 
-## 25. Checklist Antes De Alterar O Projeto
+## 26. Checklist Antes De Alterar O Projeto
 
 Antes de qualquer mudanca relevante:
 
@@ -859,7 +967,7 @@ Antes de qualquer mudanca relevante:
 6. Evitar quebrar o deploy em `.github/workflows/deploy.yml`.
 7. Atualizar este documento se a mudanca alterar comportamento ou contrato.
 
-## 26. Definicao De Pronto
+## 27. Definicao De Pronto
 
 Uma feature esta pronta quando:
 
