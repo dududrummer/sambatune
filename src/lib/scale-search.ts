@@ -143,6 +143,7 @@ function cleanSequentialScaleFrets(scaleFrets: number[][], tuning: string[]): nu
     const clean: number[] = [];
 
     for (const fret of withoutOpen) {
+      if (clean.length >= 3) break;
       const pitch = midiBases[stringIndex] + fret;
       if (seenPitches.has(pitch)) continue;
       seenPitches.add(pitch);

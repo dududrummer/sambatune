@@ -376,6 +376,7 @@ Funcionalidades atuais:
 - Exemplo: em `C7M`, se a posicao escolhida tem `E` como nota mais grave, o modo jonio de C aparece como forma de `E Frigio`, porque usa as mesmas notas da escala de Do.
 - O mini-diagrama usa `VoicingMiniSvg` em `renderMode="arpeggio"` para desenhar varias notas por corda, com cor verde para escala e fundamental em vermelho.
 - Em escalas, o shape exibido e limpo para ficar sequencial: evita corda solta quando ha alternativa no proprio desenho e remove repeticoes da mesma altura entre cordas.
+- Em escalas, cada corda deve exibir no maximo tres notas.
 - Toda ocorrencia da fundamental dentro do shape de escala deve ficar vermelha, nao apenas a primeira.
 
 Fonte de dados:
