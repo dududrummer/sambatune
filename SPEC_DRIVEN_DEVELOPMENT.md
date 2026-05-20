@@ -375,11 +375,13 @@ Funcionalidades atuais:
 - As opcoes sao mostradas em funcao da nota mais grave do shape escolhido, nao por rotulos genericos como aberto/baixo/medio/alto.
 - Exemplo: em `C7M`, se a posicao escolhida tem `E` como nota mais grave, o modo jonio de C aparece como forma de `E Frigio`, porque usa as mesmas notas da escala de Do.
 - O mini-diagrama usa `VoicingMiniSvg` em `renderMode="arpeggio"` para desenhar varias notas por corda, com cor verde para escala e fundamental em vermelho.
+- Em escalas, o shape exibido e limpo para ficar sequencial: evita corda solta quando ha alternativa no proprio desenho e remove repeticoes da mesma altura entre cordas.
+- Toda ocorrencia da fundamental dentro do shape de escala deve ficar vermelha, nao apenas a primeira.
 
 Fonte de dados:
 
 - O arquivo `diagramas/Shapes e arpejos/shapes_escalas.json` define possibilidades por qualidade de acorde e shapes modais estritos.
-- O sistema deve respeitar os desenhos do JSON sem acrescentar notas fora do shape definido.
+- O sistema deve respeitar os desenhos do JSON sem acrescentar notas fora do shape definido; a limpeza apenas remove duplicacoes/cordas soltas indesejadas.
 - Para `C7M`, o resultado esperado inclui opcoes compativeis com acordes maiores/7M, como jonio e lidio.
 
 Observacoes:

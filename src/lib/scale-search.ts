@@ -80,6 +80,21 @@ function noteName(index: number): string {
   return CHROMATIC_NOTES[normalizeInterval(index)] ?? 'C';
 }
 
+function getApproxMidiBases(tuning: string[]): number[] {
+  let previous = 48 + getNoteIndex(tuning[0]);
+  const bases = [previous];
+
+  for (let index = 1; index < tuning.length; index++) {
+    const noteIndex = getNoteIndex(tuning[index]);
+    let midi = 48 + noteIndex;
+    while (midi <= previous) midi += 12;
+    bases.push(midi);
+    previous = midi;
+  }
+
+  return bases;
+}
+
 function getQualityBucket(qualityName: string): string {
   if (qualityName.includes('Menor 7b5') || qualityName.includes('Menor b5')) return 'halfDiminished';
   if (qualityName.includes('Diminuto')) return 'diminished';
@@ -118,6 +133,34 @@ function fretListToChordFrets(shape: number[][]): number[] {
   return shape.map((stringFrets) => stringFrets[0] ?? -1);
 }
 
+function cleanSequentialScaleFrets(scaleFrets: number[][], tuning: string[]): number[][] {
+  const midiBases = getApproxMidiBases(tuning);
+  const seenPitches = new Set<number>();
+
+  return scaleFrets.map((rawStringFrets, stringIndex) => {
+    const sorted = [...new Set(rawStringFrets)].sort((a, b) => a - b);
+    const withoutOpen = sorted.length > 1 ? sorted.filter((fret) => fret !== 0) : sorted;
+    const clean: number[] = [];
+
+    for (const fret of withoutOpen) {
+      const pitch = midiBases[stringIndex] + fret;
+      if (seenPitches.has(pitch)) continue;
+      seenPitches.add(pitch);
+      clean.push(fret);
+    }
+
+    return clean;
+  });
+}
+
+function findAllRootsInShape(scaleFrets: number[][], tuning: string[], rootIndex: number): number[][] {
+  return scaleFrets.map((stringFrets, stringIndex) => {
+    const openIndex = getNoteIndex(tuning[stringIndex]);
+    if (openIndex === -1) return [];
+    return stringFrets.filter((fret) => noteIndexAtFret(openIndex, fret) === rootIndex);
+  });
+}
+
 function findRootInShape(
   scaleFrets: number[][],
   tuning: string[],
@@ -149,12 +192,13 @@ function buildStrictScaleVoicing(
   chordRootIndex: number,
   selectedChord: Voicing,
 ): Voicing | null {
-  const scaleFrets = [
+  const rawScaleFrets = [
     modeShape.shape['1'].map((fret) => fret + anchorFret),
     modeShape.shape['2'].map((fret) => fret + anchorFret),
     modeShape.shape['3'].map((fret) => fret + anchorFret),
     modeShape.shape['4'].map((fret) => fret + anchorFret),
   ].map((stringFrets) => stringFrets.filter((fret) => fret >= 0));
+  const scaleFrets = cleanSequentialScaleFrets(rawScaleFrets, tuning);
 
   if (!scaleFrets.some((stringFrets) => stringFrets.length > 0)) return null;
 
@@ -165,6 +209,7 @@ function buildStrictScaleVoicing(
     string: selectedChord.rootString,
     fret: selectedChord.rootFret,
   });
+  const rootFrets = findAllRootsInShape(scaleFrets, tuning, chordRootIndex);
 
   return {
     frets: fallbackFrets,
@@ -176,6 +221,7 @@ function buildStrictScaleVoicing(
     omitted: [],
     fingerCount: fallbackFrets.filter((fret) => fret > 0).length,
     arpeggioFrets: scaleFrets,
+    rootFrets,
     rootString: root?.string,
     rootFret: root?.fret,
   };

@@ -45,6 +45,9 @@ export function VoicingMiniSvg({
   const strSp = stringCount > 1 ? iW / (stringCount - 1) : iW;
   const sx = (s: number) => ml + s * strSp;
   const r = Math.min(fretH, strSp) * 0.35; // 70% diameter
+  const isRootMarker = (stringIndex: number, fret: number) =>
+    (voicing.rootFrets?.[stringIndex]?.includes(fret) ?? false) ||
+    (stringIndex === voicing.rootString && fret === voicing.rootFret);
 
   return (
     <svg viewBox={`0 0 ${width} ${height}`} width={width} height={height} style={{display:'block'}}>
@@ -76,11 +79,11 @@ export function VoicingMiniSvg({
         if (!stringFrets) return null;
         return stringFrets.map((fret) => {
           if (fret === 0) {
-            return <circle key={`arp-0-${s}`} cx={sx(s)} cy={mt - 4} r={2.5} fill={arpeggioColor} stroke="none" />;
+            return <circle key={`arp-0-${s}`} cx={sx(s)} cy={mt - 4} r={2.5} fill={isRootMarker(s, fret) ? rootColor : arpeggioColor} stroke="none" />;
           }
           const rel = fret - sf + 1;
           if (rel < 1 || rel > FRETS) return null;
-          const isRoot = s === voicing.rootString && fret === voicing.rootFret;
+          const isRoot = isRootMarker(s, fret);
           return <circle key={`arp-${fret}-${s}`} cx={sx(s)} cy={mt + (rel - 0.5) * fretH} r={r} fill={isRoot ? rootColor : arpeggioColor} />;
         });
       })}
@@ -90,14 +93,14 @@ export function VoicingMiniSvg({
           <text key={s} x={sx(s)} y={mt - 4} textAnchor="middle" fill={primaryColor} fontSize={7} fontWeight="bold">✕</text>
         );
         if (fret === 0) {
-          const isRoot = s === voicing.rootString && voicing.rootFret === 0;
+          const isRoot = isRootMarker(s, fret);
           return isRoot
             ? <circle key={s} cx={sx(s)} cy={mt - 4} r={3} fill={rootColor} />
             : <circle key={s} cx={sx(s)} cy={mt - 4} r={2.5} fill="none" stroke={primaryColor} strokeWidth={0.8} />;
         }
         const rel = fret - sf + 1;
         if (rel < 1 || rel > FRETS) return null;
-        const isRoot = s === voicing.rootString && fret === voicing.rootFret;
+        const isRoot = isRootMarker(s, fret);
         return <circle key={s} cx={sx(s)} cy={mt + (rel - 0.5) * fretH} r={r} fill={isRoot ? rootColor : markerColor} />;
       })}
     </svg>
