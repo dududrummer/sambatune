@@ -68,12 +68,74 @@ const JSON_STRING_TO_APP_STRING: Record<number, number> = {
 
 const APP_STRING_TO_F_CODE = ['F4', 'F3', 'F2', 'F1'] as const;
 
+const MAJOR_SCALE_INTERVALS = [0, 2, 4, 5, 7, 9, 11] as const;
+
+const GREEK_MODE_BY_DEGREE = [
+  { prefix: 'X_ionian_F1_F4', modeName: 'Jônio', parentRootOffset: 0 },
+  { prefix: 'X_dorian_F2', modeName: 'Dórico', parentRootOffset: 10 },
+  { prefix: 'X_phrygian_F3', modeName: 'Frígio', parentRootOffset: 8 },
+  { prefix: 'X_lydian_F3', modeName: 'Lídio', parentRootOffset: 7 },
+  { prefix: 'X_mixolydian_F3', modeName: 'Mixolídio', parentRootOffset: 5 },
+  { prefix: 'X_aeolian_F4', modeName: 'Eólio', parentRootOffset: 3 },
+  { prefix: 'X_locrian_F1_F4', modeName: 'Lócrio', parentRootOffset: 1 },
+] as const;
+
+const GREEK_MODE_PREFIXES = new Set<string>(GREEK_MODE_BY_DEGREE.map((mode) => mode.prefix));
+
 function normalizeInterval(interval: number): number {
   return ((interval % 12) + 12) % 12;
 }
 
 function noteName(index: number): string {
   return CHROMATIC_NOTES[normalizeInterval(index)] ?? 'C';
+}
+
+function getMajorScaleDegree(parentRootIndex: number, noteIndex: number): number {
+  return MAJOR_SCALE_INTERVALS.indexOf(normalizeInterval(noteIndex - parentRootIndex) as typeof MAJOR_SCALE_INTERVALS[number]);
+}
+
+function isGreekModeUsage(usage: ScaleUsage): boolean {
+  return GREEK_MODE_PREFIXES.has(usage.shapePrefix);
+}
+
+function getGreekModeParentRootOffset(prefix: string): number {
+  return GREEK_MODE_BY_DEGREE.find((mode) => mode.prefix === prefix)?.parentRootOffset ?? 0;
+}
+
+function getRegionalGreekMode(
+  usage: ScaleUsage,
+  parentRootIndex: number,
+  position: ScalePosition,
+): {
+  shapePrefix: string;
+  shapeRootIndex: number;
+  regionLabel: string | null;
+} {
+  if (!isGreekModeUsage(usage)) {
+    return {
+      shapePrefix: usage.shapePrefix,
+      shapeRootIndex: normalizeInterval(parentRootIndex - usage.parentRootOffset + usage.shapeRootOffset),
+      regionLabel: null,
+    };
+  }
+
+  const positionNoteIndex = getNoteIndex(position.lowestNote);
+  const degreeIndex = positionNoteIndex === -1 ? -1 : getMajorScaleDegree(parentRootIndex, positionNoteIndex);
+
+  if (degreeIndex === -1) {
+    return {
+      shapePrefix: usage.shapePrefix,
+      shapeRootIndex: normalizeInterval(parentRootIndex - usage.parentRootOffset + usage.shapeRootOffset),
+      regionLabel: null,
+    };
+  }
+
+  const mode = GREEK_MODE_BY_DEGREE[degreeIndex];
+  return {
+    shapePrefix: mode.prefix,
+    shapeRootIndex: positionNoteIndex,
+    regionLabel: `${noteName(positionNoteIndex)} ${mode.modeName}`,
+  };
 }
 
 function getLowestPlayedNote(voicing: Voicing, tuning: string[]): {
@@ -416,7 +478,7 @@ function getDirectJsonUsages(relatedScalePrefixes: string[]): ScaleUsage[] {
     modeName: prefix.replace(/^X/, '').replace(/^m_/, 'menor ').replace(/_/g, ' ').trim() || 'Escala',
     shapePrefix: prefix,
     shapeRootOffset: 0,
-    parentRootOffset: 0,
+    parentRootOffset: getGreekModeParentRootOffset(prefix),
     description: 'Relação direta declarada no JSON',
   }));
 }
@@ -452,6 +514,14 @@ function findRootFrets(scaleFrets: number[][], tuning: string[], targetRootIndex
   });
 }
 
+function getPrimaryRootMarker(rootFrets: number[][]): { string: number; fret: number } | null {
+  for (let stringIndex = 0; stringIndex < rootFrets.length; stringIndex++) {
+    const fret = rootFrets[stringIndex][0];
+    if (fret !== undefined) return { string: stringIndex, fret };
+  }
+  return null;
+}
+
 function buildScaleVoicing(
   shape: ScaleShapeEntry,
   scaleRootIndex: number,
@@ -467,14 +537,8 @@ function buildScaleVoicing(
   const scaleFrets = appFretsFromJsonShape(shape, delta);
   if (scaleFrets.some((stringFrets) => stringFrets.some((fret) => fret < 0))) return null;
 
-  const rootString = JSON_STRING_TO_APP_STRING[shape.fundamental.string];
-  const rootFret = shape.fundamental.fret + delta;
-  if (rootString === undefined || rootFret < 0) return null;
-
   const rootFrets = findRootFrets(scaleFrets, tuning, chordRootIndex);
-  if (!rootFrets[rootString].includes(rootFret)) {
-    rootFrets[rootString] = [...rootFrets[rootString], rootFret].sort((a, b) => a - b);
-  }
+  const primaryRoot = getPrimaryRootMarker(rootFrets);
 
   const fallbackFrets = chordFretsFromScale(scaleFrets);
   const pressedFrets = scaleFrets.flat().filter((fret) => fret > 0);
@@ -491,8 +555,8 @@ function buildScaleVoicing(
     fingerCount: fallbackFrets.filter((fret) => fret > 0).length,
     arpeggioFrets: scaleFrets,
     rootFrets,
-    rootString,
-    rootFret,
+    rootString: primaryRoot?.string,
+    rootFret: primaryRoot?.fret,
   };
 }
 
@@ -553,24 +617,31 @@ export function getScaleOptionsForPosition(
   );
   const usages = [...modalUsages, ...directUsages];
   const candidateResults = usages.flatMap((usage) => {
+    const parentRootIndex = normalizeInterval(chordRootIndex + usage.parentRootOffset);
+    const regionalMode = getRegionalGreekMode(usage, parentRootIndex, position);
     const matchingShapes = SCALE_CONFIG.scales.filter((shape) => {
-      const prefixMatches = shape.name === usage.shapePrefix || shape.name.startsWith(`${usage.shapePrefix}_`);
+      const prefixMatches =
+        shape.name === regionalMode.shapePrefix || shape.name.startsWith(`${regionalMode.shapePrefix}_`);
       const directRelationMatches =
-        usage.id.startsWith('json-') && isScaleRelatedToChord(shape, genericSymbols, [usage.shapePrefix]);
+        usage.id.startsWith('json-') &&
+        !isGreekModeUsage(usage) &&
+        isScaleRelatedToChord(shape, genericSymbols, [usage.shapePrefix]);
       return prefixMatches || directRelationMatches;
     });
 
     const usageResults = matchingShapes
       .map((shape) => {
-        const shapeRootIndex = normalizeInterval(chordRootIndex + usage.shapeRootOffset);
-        const parentRootIndex = normalizeInterval(chordRootIndex + usage.parentRootOffset);
+        const shapeRootIndex = regionalMode.shapeRootIndex;
         const voicing = buildScaleVoicing(shape, shapeRootIndex, chordRootIndex, tuning);
         if (!voicing) return null;
 
-        const formLabel = `${shape.fundamental.code} ${formatDirection(shape.name)}`;
+        const formLabel = [regionalMode.regionLabel, shape.fundamental.code, formatDirection(shape.name)]
+          .filter(Boolean)
+          .join(' · ');
         const descriptionParts = [
           usage.description,
           `Escala-mae: ${noteName(parentRootIndex)}`,
+          regionalMode.regionLabel ? `Regiao escolhida: ${regionalMode.regionLabel}` : null,
           shape.usageNotes,
           shape.relatedChords?.length ? `Acordes: ${shape.relatedChords.join(', ')}` : null,
         ].filter(Boolean);
