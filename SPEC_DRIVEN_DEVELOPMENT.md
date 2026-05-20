@@ -1,6 +1,6 @@
 # SambaTune - Spec Driven Development
 
-Ultima revisao: 2026-05-19
+Ultima revisao: 2026-05-20
 
 Este documento descreve o estado atual do SambaTune, como o projeto esta organizado e quais contratos tecnicos devem ser preservados em evolucoes futuras. Use como referencia antes de implementar novas features, refatoracoes ou alteracoes de produto.
 
@@ -371,24 +371,29 @@ Funcionalidades atuais:
 - Busca por acorde/qualidade, por exemplo `C7M`.
 - Depois da busca, o usuario escolhe a posicao do acorde que sera usada como referencia.
 - `parseChord` identifica raiz e qualidade do acorde; `arpeggio-search.ts` fornece as posicoes do acorde.
-- `scale-search.ts` cruza a qualidade do acorde com possibilidades modais compativeis.
-- As opcoes sao mostradas em funcao da nota mais grave do shape escolhido, nao por rotulos genericos como aberto/baixo/medio/alto.
-- Exemplo: em `C7M`, se a posicao escolhida tem `E` como nota mais grave, o modo jonio de C aparece como forma de `E Frigio`, porque usa as mesmas notas da escala de Do.
+- `scale-search.ts` usa `chordScaleRelations` e `relatedChords` do JSON para cruzar o acorde digitado com as escalas compativeis.
+- As opcoes sao mostradas em funcao da corda da fundamental do acorde escolhido (`F1`, `F2`, `F3`, `F4`), nao por rotulos genericos como aberto/baixo/medio/alto.
+- O nome do shape no JSON e a propriedade `fundamental.code` indicam onde esta a tonica. Exemplo: `X_major_F3_tras` usa fundamental em `F3`.
+- A ordem de cordas do JSON e `1=D aguda`, `2=B`, `3=G`, `4=D grave`; a ordem interna do app e DGBD do grave para o agudo, portanto `scale-search.ts` converte para `[4, 3, 2, 1]` antes de renderizar.
 - O mini-diagrama usa `VoicingMiniSvg` em `renderMode="arpeggio"` para desenhar varias notas por corda, com cor verde para escala e fundamental em vermelho.
-- Em escalas, o codigo deve renderizar o shape definido no JSON sem limpar, inferir, completar ou remover notas em runtime.
-- Em escalas, cada corda deve exibir no maximo tres notas; essa regra deve estar refletida no proprio JSON.
-- Toda ocorrencia da fundamental dentro do shape de escala deve ficar vermelha, nao apenas a primeira.
+- Em escalas, o codigo deve renderizar o shape definido no JSON sem limpar, completar ou remover notas em runtime.
+- A transposicao e permitida apenas para levar o shape relativo `X` ate a raiz do acorde digitado; o desenho relativo do JSON deve permanecer intacto.
+- Em escalas, cada corda deve exibir no maximo tres notas quando essa regra estiver refletida no proprio JSON.
+- Toda ocorrencia da fundamental dentro do shape de escala deve ficar vermelha, usando a nota real do acorde e mantendo a fundamental declarada no JSON como ancora.
 
 Fonte de dados:
 
-- O arquivo `diagramas/Shapes e arpejos/shapes_escalas.json` define possibilidades por qualidade de acorde e shapes modais estritos.
+- O arquivo `diagramas/Shapes e arpejos/shapes_escalas.json` define possibilidades por acorde em `chordScaleRelations`.
+- Cada item em `scales` possui `name`, `scaleType`, `aliases`, `formula`, `fundamental`, `scale`, `relatedChords` e `sourceGroup`.
+- `fundamental.string` segue a numeracao do JSON, nao o indice interno do app.
+- `scale` e um objeto com as cordas `"1"`, `"2"`, `"3"` e `"4"` e listas de trastes exatos por corda.
 - O sistema deve respeitar os desenhos do JSON sem acrescentar ou remover notas fora do shape definido.
-- Para `C7M`, o resultado esperado inclui opcoes compativeis com acordes maiores/7M, como jonio e lidio.
+- Para `C7M`, o resultado esperado vem de `chordScaleRelations.X7M`, atualmente `X_major` e `X_pentatonic_major`, filtrado pela corda da fundamental da posicao escolhida.
 
 Observacoes:
 
 - Ainda nao ha salvamento/publicacao propria para escalas.
-- Se o dicionario crescer com shapes manuais especificos, manter o contrato de `modesByChordQuality` e `modeShapes`.
+- Se o dicionario crescer com shapes manuais especificos, manter o contrato atual baseado em `chordScaleRelations`, `relatedChords`, `fundamental` e `scale`.
 
 ## 11. Parser Musical
 
@@ -974,7 +979,8 @@ interface Voicing {
   isPriority?: boolean;
   rootString?: number;
   rootFret?: number;
-  arpeggioFrets?: Array<{ string: number; fret: number }>;
+  arpeggioFrets?: number[][];
+  rootFrets?: number[][];
 }
 ```
 

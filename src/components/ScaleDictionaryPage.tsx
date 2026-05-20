@@ -237,7 +237,7 @@ export function ScaleDictionaryPage({
                   <div>
                     <h3 className="text-sm font-bold">{scale.name}</h3>
                     <p className="text-[11px] text-muted-foreground">
-                      {scale.description} Parent scale: {scale.parentScaleName}
+                      {scale.description} Shape JSON: {scale.parentScaleName}
                     </p>
                     <p className="text-[11px] text-muted-foreground font-mono">
                       {scale.noteNames.join(' - ')}

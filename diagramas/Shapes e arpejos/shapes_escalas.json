@@ -6,290 +6,3195 @@
     "3": "G",
     "4": "D"
   },
-  "stringOrder": "1=D aguda; 2=B; 3=G; 4=D grave",
-  "rootNaming": "F1/F2/F3/F4 = corda onde esta a fundamental do acorde",
-  "positionNaming": "A posicao vem do acorde escolhido. As escalas abaixo usam formas modais estritas, transpostas pela nota mais grave do shape.",
-  "modesByChordQuality": {
-    "major7": [
-      {
-        "id": "ionian",
-        "name": "Jonio",
-        "scaleDegree": 1,
-        "parentScaleOffset": 0,
-        "formMode": "Frigio",
-        "formRootOffset": 4,
-        "description": "Acorde como I grau da escala maior."
-      },
-      {
-        "id": "lydian",
-        "name": "Lidio",
-        "scaleDegree": 4,
-        "parentScaleOffset": 7,
-        "formMode": "Locrio",
-        "formRootOffset": 11,
-        "description": "Acorde como IV grau da escala maior."
-      }
+  "stringOrder": "1=D aguda (corda de baixo); 2=B; 3=G; 4=D grave (corda de cima)",
+  "rootNaming": "X = nota genérica; F1/F2/F3/F4 = corda onde está a fundamental/tônica",
+  "deduplication": "Shapes iguais encontrados nos ciclos de quartas/quintas foram consolidados uma única vez.",
+  "sourceFiles": [
+    "Escalas maiores - Ciclo das QUARTAS(1).pdf",
+    "Escalas maiores - Ciclo das QUINTAS(1).pdf",
+    "Escalas Menor Natural - Ciclo das QUARTAS(1).pdf",
+    "Escalas Menor Natural - Ciclo das QUINTAS(1).pdf",
+    "Pentatônica Maior - Ciclo das QUINTAS(1).pdf",
+    "Pentatônica Maior - Ciclo das QUARTAS(1).pdf",
+    "Escalas Pentatônica Menor Natural - Ciclo das QUINTAS(1).pdf",
+    "Escalas Pentatônica Menor Natural - Ciclo das QUARTAS(1).pdf",
+    "Escalas Menor Harmônica - Ciclo das QUARTAS(1).pdf",
+    "Escalas Menor Harmônica - Ciclo das QUINTAS(1).pdf",
+    "Escalas Menor Melódica - Ciclo das QUINTAS(1).pdf",
+    "Escalas Menor Melódica - Ciclo das QUARTAS(1).pdf",
+    "Escalas Penta BLUE NOTE Menor - Ciclo das QUARTAS(1).pdf",
+    "Escalas Penta BLUE NOTE Menor - Ciclo das QUINTAS(1).pdf",
+    "Escalas Penta BLUE NOTE Maior - Ciclo das QUINTAS(1).pdf",
+    "Escalas Penta BLUE NOTE Maior - Ciclo das QUARTAS(1).pdf",
+    "Escalas TONS INTEIROS(1).pdf",
+    "Escala CROMÁTICA(1).pdf",
+    "Escala DIMINUTA(1).pdf",
+    "Escala DOMINANTE DIMINUTA (DOM DIM)(1).pdf",
+    "Escala Alterada (ALT)(1).pdf"
+  ],
+  "chordScaleRelations": {
+    "X": [
+      "X_major",
+      "X_pentatonic_major",
+      "X_blues_major"
     ],
-    "major": [
-      {
-        "id": "ionian",
-        "name": "Jonio",
-        "scaleDegree": 1,
-        "parentScaleOffset": 0,
-        "formMode": "Frigio",
-        "formRootOffset": 4,
-        "description": "Acorde como I grau da escala maior."
-      },
-      {
-        "id": "lydian",
-        "name": "Lidio",
-        "scaleDegree": 4,
-        "parentScaleOffset": 7,
-        "formMode": "Locrio",
-        "formRootOffset": 11,
-        "description": "Acorde como IV grau da escala maior."
-      },
-      {
-        "id": "major-pentatonic",
-        "name": "Pentatonica Maior",
-        "scaleDegree": 1,
-        "parentScaleOffset": 0,
-        "formMode": "Pentatonica Maior",
-        "formRootOffset": 0,
-        "description": "Pentatonica maior sobre acorde maior."
-      }
+    "X6": [
+      "X_major",
+      "X_pentatonic_major",
+      "X_blues_major"
     ],
-    "dominant": [
-      {
-        "id": "mixolydian",
-        "name": "Mixolidio",
-        "scaleDegree": 5,
-        "parentScaleOffset": 5,
-        "formMode": "Jonio",
-        "formRootOffset": 5,
-        "description": "Acorde como V grau da escala maior."
-      },
-      {
-        "id": "lydian-dominant",
-        "name": "Lidio Dominante",
-        "scaleDegree": 4,
-        "parentScaleOffset": 7,
-        "formMode": "Lidio",
-        "formRootOffset": 0,
-        "description": "Som de dominante com #11."
-      },
-      {
-        "id": "altered",
-        "name": "Alterada",
-        "scaleDegree": 7,
-        "parentScaleOffset": 1,
-        "formMode": "Alterada",
-        "formRootOffset": 0,
-        "description": "Dominante alterado."
-      }
+    "X7M": [
+      "X_major",
+      "X_pentatonic_major"
     ],
-    "minor7": [
-      {
-        "id": "dorian",
-        "name": "Dorico",
-        "scaleDegree": 2,
-        "parentScaleOffset": 10,
-        "formMode": "Eolio",
-        "formRootOffset": 7,
-        "description": "Acorde como II grau da escala maior."
-      },
-      {
-        "id": "aeolian",
-        "name": "Eolio",
-        "scaleDegree": 6,
-        "parentScaleOffset": 3,
-        "formMode": "Jonio",
-        "formRootOffset": 3,
-        "description": "Acorde como VI grau da escala maior."
-      },
-      {
-        "id": "minor-pentatonic",
-        "name": "Pentatonica Menor",
-        "scaleDegree": 1,
-        "parentScaleOffset": 0,
-        "formMode": "Pentatonica Menor",
-        "formRootOffset": 0,
-        "description": "Pentatonica menor sobre acorde menor."
-      }
+    "X7": [
+      "X_blues_major",
+      "Xm_blues_minor",
+      "X_whole_tone",
+      "X_diminished",
+      "X7_dominant_diminished",
+      "X7_altered"
     ],
-    "minor": [
-      {
-        "id": "dorian",
-        "name": "Dorico",
-        "scaleDegree": 2,
-        "parentScaleOffset": 10,
-        "formMode": "Eolio",
-        "formRootOffset": 7,
-        "description": "Opcao menor com sexta maior."
-      },
-      {
-        "id": "aeolian",
-        "name": "Eolio",
-        "scaleDegree": 6,
-        "parentScaleOffset": 3,
-        "formMode": "Jonio",
-        "formRootOffset": 3,
-        "description": "Opcao menor natural."
-      },
-      {
-        "id": "minor-pentatonic",
-        "name": "Pentatonica Menor",
-        "scaleDegree": 1,
-        "parentScaleOffset": 0,
-        "formMode": "Pentatonica Menor",
-        "formRootOffset": 0,
-        "description": "Pentatonica menor sobre acorde menor."
-      }
+    "X7(#5)": [
+      "X_whole_tone",
+      "X7_altered"
     ],
-    "halfDiminished": [
-      {
-        "id": "locrian",
-        "name": "Locrio",
-        "scaleDegree": 7,
-        "parentScaleOffset": 1,
-        "formMode": "Locrio",
-        "formRootOffset": 0,
-        "description": "Acorde meio diminuto como VII grau."
-      }
+    "X7(b5)": [
+      "X_whole_tone",
+      "X_diminished",
+      "X7_dominant_diminished",
+      "X7_altered"
     ],
-    "diminished": [
-      {
-        "id": "diminished",
-        "name": "Diminuta",
-        "scaleDegree": 1,
-        "parentScaleOffset": 0,
-        "formMode": "Diminuta",
-        "formRootOffset": 0,
-        "description": "Escala diminuta sobre acorde diminuto."
-      }
+    "Xm": [
+      "Xm_natural",
+      "Xm_pentatonic_minor",
+      "Xm_blues_minor",
+      "Xm_harmonic_minor",
+      "Xm_melodic_minor"
+    ],
+    "Xm7": [
+      "Xm_natural",
+      "Xm_pentatonic_minor",
+      "Xm_blues_minor"
+    ],
+    "Xm6": [
+      "Xm_melodic_minor"
+    ],
+    "Xm7M": [
+      "Xm_harmonic_minor",
+      "Xm_melodic_minor"
+    ],
+    "Xm7(b5)": [
+      "X_diminished"
+    ],
+    "Xdim": [
+      "X_diminished"
+    ],
+    "Xº": [
+      "X_diminished"
+    ],
+    "any": [
+      "X_chromatic"
+    ],
+    "X7alt": [
+      "X7_altered"
+    ],
+    "X7(b9)": [
+      "X7_dominant_diminished",
+      "X7_altered"
+    ],
+    "X7(#9)": [
+      "X7_dominant_diminished",
+      "X7_altered"
+    ],
+    "X7(b9,#9)": [
+      "X7_dominant_diminished",
+      "X7_altered"
+    ],
+    "X7(#11)": [
+      "X7_dominant_diminished"
+    ],
+    "X13(b9)": [
+      "X7_dominant_diminished"
+    ],
+    "X7(13,b9)": [
+      "X7_dominant_diminished"
+    ],
+    "X7(b13)": [
+      "X7_altered"
+    ],
+    "X7(#5,b9)": [
+      "X7_altered"
+    ],
+    "X7(#5,#9)": [
+      "X7_altered"
     ]
   },
-  "modeShapes": [
+  "scales": [
     {
-      "id": "ionian-strict",
-      "mode": "Jonio",
-      "formula": [0, 2, 4, 5, 7, 9, 11],
-      "shape": {
-        "1": [0, 2, 4],
-        "2": [1, 3, 5],
-        "3": [0, 2, 4],
-        "4": [0, 2, 4]
-      }
+      "name": "X_major_F2",
+      "scaleType": "major",
+      "aliases": [
+        "Escala maior",
+        "Jônio"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3M",
+        "4J",
+        "5J",
+        "6M",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 1
+      },
+      "scale": {
+        "1": [
+          0,
+          2,
+          3
+        ],
+        "2": [
+          0,
+          1
+        ],
+        "3": [
+          0,
+          2
+        ],
+        "4": [
+          0,
+          2,
+          3
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7M",
+        "Xadd9",
+        "X6/9"
+      ],
+      "sourceGroup": "Escala Maior"
     },
     {
-      "id": "phrygian-strict",
-      "mode": "Frigio",
-      "formula": [0, 1, 3, 5, 7, 8, 10],
-      "shape": {
-        "1": [0, 1, 3],
-        "2": [1, 3, 4],
-        "3": [0, 1, 3],
-        "4": [0, 1, 3]
-      }
+      "name": "X_major_F3_tras",
+      "scaleType": "major",
+      "aliases": [
+        "Escala maior",
+        "Jônio"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3M",
+        "4J",
+        "5J",
+        "6M",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 5
+      },
+      "scale": {
+        "1": [
+          2,
+          3,
+          5
+        ],
+        "2": [
+          3
+        ],
+        "3": [
+          2,
+          4,
+          5
+        ],
+        "4": [
+          2,
+          3,
+          5
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7M",
+        "Xadd9",
+        "X6/9"
+      ],
+      "sourceGroup": "Escala Maior"
     },
     {
-      "id": "dorian-strict",
-      "mode": "Dorico",
-      "formula": [0, 2, 3, 5, 7, 9, 10],
-      "shape": {
-        "1": [0, 2, 3],
-        "2": [1, 3, 5],
-        "3": [0, 2, 3],
-        "4": [0, 2, 3]
-      }
+      "name": "X_major_F3_frente",
+      "scaleType": "major",
+      "aliases": [
+        "Escala maior",
+        "Jônio"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3M",
+        "4J",
+        "5J",
+        "6M",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 5
+      },
+      "scale": {
+        "1": [
+          5,
+          7,
+          9
+        ],
+        "2": [
+          5,
+          6
+        ],
+        "3": [
+          5,
+          7
+        ],
+        "4": [
+          5,
+          7,
+          9
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7M",
+        "Xadd9",
+        "X6/9"
+      ],
+      "sourceGroup": "Escala Maior"
     },
     {
-      "id": "lydian-strict",
-      "mode": "Lidio",
-      "formula": [0, 2, 4, 6, 7, 9, 11],
-      "shape": {
-        "1": [0, 2, 4],
-        "2": [1, 3, 5],
-        "3": [0, 2, 4],
-        "4": [0, 2, 4]
-      }
+      "name": "X_major_F1_tras",
+      "scaleType": "major",
+      "aliases": [
+        "Escala maior",
+        "Jônio"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3M",
+        "4J",
+        "5J",
+        "6M",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F1",
+        "string": 1,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          7,
+          9,
+          10
+        ],
+        "2": [
+          8
+        ],
+        "3": [
+          7,
+          9,
+          10
+        ],
+        "4": [
+          7,
+          9,
+          10
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7M",
+        "Xadd9",
+        "X6/9"
+      ],
+      "sourceGroup": "Escala Maior"
     },
     {
-      "id": "mixolydian-strict",
-      "mode": "Mixolidio",
-      "formula": [0, 2, 4, 5, 7, 9, 10],
-      "shape": {
-        "1": [0, 2, 4],
-        "2": [0, 1, 3],
-        "3": [0, 2, 4],
-        "4": [0, 2, 4]
-      }
+      "name": "X_major_F4_frente",
+      "scaleType": "major",
+      "aliases": [
+        "Escala maior",
+        "Jônio"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3M",
+        "4J",
+        "5J",
+        "6M",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F4",
+        "string": 4,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          9,
+          10,
+          12
+        ],
+        "2": [
+          10
+        ],
+        "3": [
+          9,
+          10,
+          12
+        ],
+        "4": [
+          9,
+          10,
+          12
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7M",
+        "Xadd9",
+        "X6/9"
+      ],
+      "sourceGroup": "Escala Maior"
     },
     {
-      "id": "locrian-strict",
-      "mode": "Locrio",
-      "formula": [0, 1, 3, 5, 6, 8, 10],
-      "shape": {
-        "1": [0, 1, 3],
-        "2": [0, 1, 3],
-        "3": [0, 1, 3],
-        "4": [0, 1, 3]
-      }
+      "name": "Xm_natural_F3_tras",
+      "scaleType": "minorNatural",
+      "aliases": [
+        "Escala menor natural",
+        "Eólio"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6m",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 2
+      },
+      "scale": {
+        "1": [
+          0,
+          2,
+          3
+        ],
+        "2": [
+          0,
+          1
+        ],
+        "3": [
+          0,
+          2
+        ],
+        "4": [
+          0,
+          2,
+          3
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "Xm9",
+        "Xm11"
+      ],
+      "sourceGroup": "Escala Menor Natural"
     },
     {
-      "id": "aeolian-strict",
-      "mode": "Eolio",
-      "formula": [0, 2, 3, 5, 7, 8, 10],
-      "shape": {
-        "1": [0, 2, 3],
-        "2": [1, 3, 4],
-        "3": [0, 2, 3],
-        "4": [0, 2, 3]
-      }
+      "name": "Xm_natural_F3_frente",
+      "scaleType": "minorNatural",
+      "aliases": [
+        "Escala menor natural",
+        "Eólio"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6m",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 2
+      },
+      "scale": {
+        "1": [
+          2,
+          3,
+          5
+        ],
+        "2": [
+          3
+        ],
+        "3": [
+          2,
+          4,
+          5
+        ],
+        "4": [
+          2,
+          3,
+          5
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "Xm9",
+        "Xm11"
+      ],
+      "sourceGroup": "Escala Menor Natural"
     },
     {
-      "id": "major-pentatonic-strict",
-      "mode": "Pentatonica Maior",
-      "formula": [0, 2, 4, 7, 9],
-      "shape": {
-        "1": [0, 2, 5],
-        "2": [1, 3],
-        "3": [0, 2, 5],
-        "4": [0, 2, 5]
-      }
+      "name": "Xm_natural_F1_tras",
+      "scaleType": "minorNatural",
+      "aliases": [
+        "Escala menor natural",
+        "Eólio"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6m",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F1",
+        "string": 1,
+        "fret": 7
+      },
+      "scale": {
+        "1": [
+          5,
+          7,
+          9
+        ],
+        "2": [
+          5,
+          6
+        ],
+        "3": [
+          5,
+          7
+        ],
+        "4": [
+          5,
+          7,
+          9
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "Xm9",
+        "Xm11"
+      ],
+      "sourceGroup": "Escala Menor Natural"
     },
     {
-      "id": "minor-pentatonic-strict",
-      "mode": "Pentatonica Menor",
-      "formula": [0, 3, 5, 7, 10],
-      "shape": {
-        "1": [0, 3, 5],
-        "2": [1, 4],
-        "3": [0, 3, 5],
-        "4": [0, 3, 5]
-      }
+      "name": "Xm_natural_F4_frente",
+      "scaleType": "minorNatural",
+      "aliases": [
+        "Escala menor natural",
+        "Eólio"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6m",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F4",
+        "string": 4,
+        "fret": 7
+      },
+      "scale": {
+        "1": [
+          7,
+          9,
+          10
+        ],
+        "2": [
+          8
+        ],
+        "3": [
+          7,
+          9,
+          10
+        ],
+        "4": [
+          7,
+          9,
+          10
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "Xm9",
+        "Xm11"
+      ],
+      "sourceGroup": "Escala Menor Natural"
     },
     {
-      "id": "altered-strict",
-      "mode": "Alterada",
-      "formula": [0, 1, 3, 4, 6, 8, 10],
-      "shape": {
-        "1": [0, 1, 3],
-        "2": [0, 2, 4],
-        "3": [0, 1, 3],
-        "4": [0, 1, 3]
-      }
+      "name": "Xm_natural_F2",
+      "scaleType": "minorNatural",
+      "aliases": [
+        "Escala menor natural",
+        "Eólio"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6m",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          9,
+          10,
+          12
+        ],
+        "2": [
+          10
+        ],
+        "3": [
+          9,
+          10,
+          12
+        ],
+        "4": [
+          9,
+          10,
+          12
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "Xm9",
+        "Xm11"
+      ],
+      "sourceGroup": "Escala Menor Natural"
     },
     {
-      "id": "diminished-strict",
-      "mode": "Diminuta",
-      "formula": [0, 2, 3, 5, 6, 8, 9, 11],
-      "shape": {
-        "1": [0, 2, 3],
-        "2": [0, 2, 3],
-        "3": [0, 2, 3],
-        "4": [0, 2, 3]
-      }
+      "name": "X_pentatonic_major_F2",
+      "scaleType": "pentatonicMajor",
+      "aliases": [
+        "Pentatônica maior"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3M",
+        "5J",
+        "6M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 1
+      },
+      "scale": {
+        "1": [
+          0,
+          2
+        ],
+        "2": [
+          1
+        ],
+        "3": [
+          0,
+          2
+        ],
+        "4": [
+          0,
+          2
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7M",
+        "X6/9"
+      ],
+      "sourceGroup": "Pentatônica Maior"
+    },
+    {
+      "name": "X_pentatonic_major_F3_tras",
+      "scaleType": "pentatonicMajor",
+      "aliases": [
+        "Pentatônica maior"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3M",
+        "5J",
+        "6M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 5
+      },
+      "scale": {
+        "1": [
+          2,
+          5
+        ],
+        "2": [
+          3
+        ],
+        "3": [
+          2,
+          5
+        ],
+        "4": [
+          2,
+          5
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7M",
+        "X6/9"
+      ],
+      "sourceGroup": "Pentatônica Maior"
+    },
+    {
+      "name": "X_pentatonic_major_F3_frente",
+      "scaleType": "pentatonicMajor",
+      "aliases": [
+        "Pentatônica maior"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3M",
+        "5J",
+        "6M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 5
+      },
+      "scale": {
+        "1": [
+          5,
+          7
+        ],
+        "2": [
+          5
+        ],
+        "3": [
+          5,
+          7
+        ],
+        "4": [
+          5,
+          7
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7M",
+        "X6/9"
+      ],
+      "sourceGroup": "Pentatônica Maior"
+    },
+    {
+      "name": "X_pentatonic_major_F1_tras",
+      "scaleType": "pentatonicMajor",
+      "aliases": [
+        "Pentatônica maior"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3M",
+        "5J",
+        "6M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F1",
+        "string": 1,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          7,
+          10
+        ],
+        "2": [
+          8
+        ],
+        "3": [
+          7,
+          9
+        ],
+        "4": [
+          7,
+          10
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7M",
+        "X6/9"
+      ],
+      "sourceGroup": "Pentatônica Maior"
+    },
+    {
+      "name": "X_pentatonic_major_F4_frente",
+      "scaleType": "pentatonicMajor",
+      "aliases": [
+        "Pentatônica maior"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3M",
+        "5J",
+        "6M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F4",
+        "string": 4,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          10,
+          12,
+          14
+        ],
+        "2": [
+          10
+        ],
+        "3": [
+          12
+        ],
+        "4": [
+          10,
+          12,
+          14
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7M",
+        "X6/9"
+      ],
+      "sourceGroup": "Pentatônica Maior"
+    },
+    {
+      "name": "Xm_pentatonic_minor_F3_tras",
+      "scaleType": "pentatonicMinor",
+      "aliases": [
+        "Pentatônica menor"
+      ],
+      "formula": [
+        "1J",
+        "3m",
+        "4J",
+        "5J",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 2
+      },
+      "scale": {
+        "1": [
+          0,
+          2
+        ],
+        "2": [
+          1
+        ],
+        "3": [
+          0,
+          2
+        ],
+        "4": [
+          0,
+          2
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "Xm11",
+        "X7_blues"
+      ],
+      "sourceGroup": "Pentatônica Menor Natural"
+    },
+    {
+      "name": "Xm_pentatonic_minor_F3_frente",
+      "scaleType": "pentatonicMinor",
+      "aliases": [
+        "Pentatônica menor"
+      ],
+      "formula": [
+        "1J",
+        "3m",
+        "4J",
+        "5J",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 2
+      },
+      "scale": {
+        "1": [
+          2,
+          5
+        ],
+        "2": [
+          3
+        ],
+        "3": [
+          2,
+          5
+        ],
+        "4": [
+          2,
+          5
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "Xm11",
+        "X7_blues"
+      ],
+      "sourceGroup": "Pentatônica Menor Natural"
+    },
+    {
+      "name": "Xm_pentatonic_minor_F1_tras",
+      "scaleType": "pentatonicMinor",
+      "aliases": [
+        "Pentatônica menor"
+      ],
+      "formula": [
+        "1J",
+        "3m",
+        "4J",
+        "5J",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F1",
+        "string": 1,
+        "fret": 7
+      },
+      "scale": {
+        "1": [
+          5,
+          7
+        ],
+        "2": [
+          5
+        ],
+        "3": [
+          5,
+          7
+        ],
+        "4": [
+          5,
+          7
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "Xm11",
+        "X7_blues"
+      ],
+      "sourceGroup": "Pentatônica Menor Natural"
+    },
+    {
+      "name": "Xm_pentatonic_minor_F4_frente",
+      "scaleType": "pentatonicMinor",
+      "aliases": [
+        "Pentatônica menor"
+      ],
+      "formula": [
+        "1J",
+        "3m",
+        "4J",
+        "5J",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F4",
+        "string": 4,
+        "fret": 7
+      },
+      "scale": {
+        "1": [
+          7,
+          10
+        ],
+        "2": [
+          8
+        ],
+        "3": [
+          7,
+          9
+        ],
+        "4": [
+          7,
+          10
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "Xm11",
+        "X7_blues"
+      ],
+      "sourceGroup": "Pentatônica Menor Natural"
+    },
+    {
+      "name": "Xm_pentatonic_minor_F2",
+      "scaleType": "pentatonicMinor",
+      "aliases": [
+        "Pentatônica menor"
+      ],
+      "formula": [
+        "1J",
+        "3m",
+        "4J",
+        "5J",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          10,
+          12,
+          14
+        ],
+        "2": [
+          10
+        ],
+        "3": [
+          12
+        ],
+        "4": [
+          10,
+          12,
+          14
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "Xm11",
+        "X7_blues"
+      ],
+      "sourceGroup": "Pentatônica Menor Natural"
+    },
+    {
+      "name": "Xm_blues_minor_F3_tras",
+      "scaleType": "bluesMinor",
+      "aliases": [
+        "Blue note menor",
+        "Blues menor"
+      ],
+      "formula": [
+        "1J",
+        "3m",
+        "4J",
+        "#4/b5",
+        "5J",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 2
+      },
+      "scale": {
+        "1": [
+          0,
+          1,
+          2
+        ],
+        "2": [
+          1
+        ],
+        "3": [
+          0,
+          2
+        ],
+        "4": [
+          0,
+          1,
+          2
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "X7_blues"
+      ],
+      "sourceGroup": "Pentatônica Blues Menor",
+      "specialDegrees": [
+        "#4/b5 = blue note"
+      ]
+    },
+    {
+      "name": "Xm_blues_minor_F3_frente",
+      "scaleType": "bluesMinor",
+      "aliases": [
+        "Blue note menor",
+        "Blues menor"
+      ],
+      "formula": [
+        "1J",
+        "3m",
+        "4J",
+        "#4/b5",
+        "5J",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 2
+      },
+      "scale": {
+        "1": [
+          2,
+          5
+        ],
+        "2": [
+          3,
+          4,
+          5
+        ],
+        "3": [
+          2,
+          5
+        ],
+        "4": [
+          2,
+          5
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "X7_blues"
+      ],
+      "sourceGroup": "Pentatônica Blues Menor",
+      "specialDegrees": [
+        "#4/b5 = blue note"
+      ]
+    },
+    {
+      "name": "Xm_blues_minor_F1_tras",
+      "scaleType": "bluesMinor",
+      "aliases": [
+        "Blue note menor",
+        "Blues menor"
+      ],
+      "formula": [
+        "1J",
+        "3m",
+        "4J",
+        "#4/b5",
+        "5J",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F1",
+        "string": 1,
+        "fret": 7
+      },
+      "scale": {
+        "1": [
+          5,
+          7
+        ],
+        "2": [
+          5
+        ],
+        "3": [
+          5,
+          7,
+          8
+        ],
+        "4": [
+          5,
+          7
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "X7_blues"
+      ],
+      "sourceGroup": "Pentatônica Blues Menor",
+      "specialDegrees": [
+        "#4/b5 = blue note"
+      ]
+    },
+    {
+      "name": "Xm_blues_minor_F4_frente",
+      "scaleType": "bluesMinor",
+      "aliases": [
+        "Blue note menor",
+        "Blues menor"
+      ],
+      "formula": [
+        "1J",
+        "3m",
+        "4J",
+        "#4/b5",
+        "5J",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F4",
+        "string": 4,
+        "fret": 7
+      },
+      "scale": {
+        "1": [
+          7,
+          10
+        ],
+        "2": [
+          8
+        ],
+        "3": [
+          7,
+          8,
+          9
+        ],
+        "4": [
+          7,
+          10
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "X7_blues"
+      ],
+      "sourceGroup": "Pentatônica Blues Menor",
+      "specialDegrees": [
+        "#4/b5 = blue note"
+      ]
+    },
+    {
+      "name": "Xm_blues_minor_F2",
+      "scaleType": "bluesMinor",
+      "aliases": [
+        "Blue note menor",
+        "Blues menor"
+      ],
+      "formula": [
+        "1J",
+        "3m",
+        "4J",
+        "#4/b5",
+        "5J",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          10,
+          12,
+          13,
+          14
+        ],
+        "2": [
+          10
+        ],
+        "3": [
+          12
+        ],
+        "4": [
+          10,
+          12,
+          13,
+          14
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7",
+        "X7_blues"
+      ],
+      "sourceGroup": "Pentatônica Blues Menor",
+      "specialDegrees": [
+        "#4/b5 = blue note"
+      ]
+    },
+    {
+      "name": "X_blues_major_F2",
+      "scaleType": "bluesMajor",
+      "aliases": [
+        "Blue note maior",
+        "Blues maior"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "3M",
+        "5J",
+        "6M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 1
+      },
+      "scale": {
+        "1": [
+          0,
+          1,
+          2
+        ],
+        "2": [
+          1
+        ],
+        "3": [
+          0,
+          2
+        ],
+        "4": [
+          0,
+          1,
+          2
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7",
+        "X7M"
+      ],
+      "sourceGroup": "Pentatônica Blues Maior",
+      "specialDegrees": [
+        "3m = blue note"
+      ]
+    },
+    {
+      "name": "X_blues_major_F3_tras",
+      "scaleType": "bluesMajor",
+      "aliases": [
+        "Blue note maior",
+        "Blues maior"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "3M",
+        "5J",
+        "6M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 5
+      },
+      "scale": {
+        "1": [
+          2,
+          5
+        ],
+        "2": [
+          3,
+          4,
+          5
+        ],
+        "3": [
+          2,
+          5
+        ],
+        "4": [
+          2,
+          5
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7",
+        "X7M"
+      ],
+      "sourceGroup": "Pentatônica Blues Maior",
+      "specialDegrees": [
+        "3m = blue note"
+      ]
+    },
+    {
+      "name": "X_blues_major_F3_frente",
+      "scaleType": "bluesMajor",
+      "aliases": [
+        "Blue note maior",
+        "Blues maior"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "3M",
+        "5J",
+        "6M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 5
+      },
+      "scale": {
+        "1": [
+          5,
+          7
+        ],
+        "2": [
+          5
+        ],
+        "3": [
+          5,
+          7,
+          8
+        ],
+        "4": [
+          5,
+          7
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7",
+        "X7M"
+      ],
+      "sourceGroup": "Pentatônica Blues Maior",
+      "specialDegrees": [
+        "3m = blue note"
+      ]
+    },
+    {
+      "name": "X_blues_major_F1_tras",
+      "scaleType": "bluesMajor",
+      "aliases": [
+        "Blue note maior",
+        "Blues maior"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "3M",
+        "5J",
+        "6M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F1",
+        "string": 1,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          7,
+          10
+        ],
+        "2": [
+          8
+        ],
+        "3": [
+          7,
+          8,
+          9
+        ],
+        "4": [
+          7,
+          10
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7",
+        "X7M"
+      ],
+      "sourceGroup": "Pentatônica Blues Maior",
+      "specialDegrees": [
+        "3m = blue note"
+      ]
+    },
+    {
+      "name": "X_blues_major_F4_frente",
+      "scaleType": "bluesMajor",
+      "aliases": [
+        "Blue note maior",
+        "Blues maior"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "3M",
+        "5J",
+        "6M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F4",
+        "string": 4,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          10,
+          12,
+          13,
+          14
+        ],
+        "2": [
+          10
+        ],
+        "3": [
+          12
+        ],
+        "4": [
+          10,
+          12,
+          13,
+          14
+        ]
+      },
+      "relatedChords": [
+        "X",
+        "X6",
+        "X7",
+        "X7M"
+      ],
+      "sourceGroup": "Pentatônica Blues Maior",
+      "specialDegrees": [
+        "3m = blue note"
+      ]
+    },
+    {
+      "name": "Xm_harmonic_minor_F3_tras",
+      "scaleType": "harmonicMinor",
+      "aliases": [
+        "Menor harmônica"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6m",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 2
+      },
+      "scale": {
+        "1": [
+          0,
+          2,
+          3
+        ],
+        "2": [
+          0,
+          1
+        ],
+        "3": [
+          1,
+          2
+        ],
+        "4": [
+          0,
+          2,
+          3
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7M",
+        "Xm(maj7)",
+        "Xdim",
+        "X7(b9)"
+      ],
+      "sourceGroup": "Escala Menor Harmônica"
+    },
+    {
+      "name": "Xm_harmonic_minor_F3_frente",
+      "scaleType": "harmonicMinor",
+      "aliases": [
+        "Menor harmônica"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6m",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 2
+      },
+      "scale": {
+        "1": [
+          2,
+          3,
+          6
+        ],
+        "2": [
+          3
+        ],
+        "3": [
+          2,
+          4,
+          5
+        ],
+        "4": [
+          2,
+          3,
+          6
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7M",
+        "Xm(maj7)",
+        "Xdim",
+        "X7(b9)"
+      ],
+      "sourceGroup": "Escala Menor Harmônica"
+    },
+    {
+      "name": "Xm_harmonic_minor_F1_tras",
+      "scaleType": "harmonicMinor",
+      "aliases": [
+        "Menor harmônica"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6m",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F1",
+        "string": 1,
+        "fret": 7
+      },
+      "scale": {
+        "1": [
+          6,
+          7,
+          9
+        ],
+        "2": [
+          5,
+          6
+        ],
+        "3": [
+          5,
+          7
+        ],
+        "4": [
+          6,
+          7,
+          9
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7M",
+        "Xm(maj7)",
+        "Xdim",
+        "X7(b9)"
+      ],
+      "sourceGroup": "Escala Menor Harmônica"
+    },
+    {
+      "name": "Xm_harmonic_minor_F4_frente",
+      "scaleType": "harmonicMinor",
+      "aliases": [
+        "Menor harmônica"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6m",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F4",
+        "string": 4,
+        "fret": 7
+      },
+      "scale": {
+        "1": [
+          7,
+          9,
+          10
+        ],
+        "2": [
+          9
+        ],
+        "3": [
+          7,
+          9,
+          10
+        ],
+        "4": [
+          7,
+          9,
+          10
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7M",
+        "Xm(maj7)",
+        "Xdim",
+        "X7(b9)"
+      ],
+      "sourceGroup": "Escala Menor Harmônica"
+    },
+    {
+      "name": "Xm_harmonic_minor_F2",
+      "scaleType": "harmonicMinor",
+      "aliases": [
+        "Menor harmônica"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6m",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          9,
+          10,
+          12
+        ],
+        "2": [
+          9,
+          10
+        ],
+        "3": [
+          9,
+          10
+        ],
+        "4": [
+          9,
+          10,
+          12
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm7M",
+        "Xm(maj7)",
+        "Xdim",
+        "X7(b9)"
+      ],
+      "sourceGroup": "Escala Menor Harmônica"
+    },
+    {
+      "name": "Xm_melodic_minor_F3_tras",
+      "scaleType": "melodicMinor",
+      "aliases": [
+        "Menor melódica"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6M",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 2
+      },
+      "scale": {
+        "1": [
+          0,
+          2,
+          4
+        ],
+        "2": [
+          0,
+          1
+        ],
+        "3": [
+          1,
+          2
+        ],
+        "4": [
+          0,
+          2,
+          4
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm6",
+        "Xm7M",
+        "Xm6/9"
+      ],
+      "sourceGroup": "Escala Menor Melódica"
+    },
+    {
+      "name": "Xm_melodic_minor_F3_frente",
+      "scaleType": "melodicMinor",
+      "aliases": [
+        "Menor melódica"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6M",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 2
+      },
+      "scale": {
+        "1": [
+          2,
+          4,
+          6
+        ],
+        "2": [
+          3
+        ],
+        "3": [
+          2,
+          4,
+          5
+        ],
+        "4": [
+          2,
+          4,
+          6
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm6",
+        "Xm7M",
+        "Xm6/9"
+      ],
+      "sourceGroup": "Escala Menor Melódica"
+    },
+    {
+      "name": "Xm_melodic_minor_F1_tras",
+      "scaleType": "melodicMinor",
+      "aliases": [
+        "Menor melódica"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6M",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F1",
+        "string": 1,
+        "fret": 7
+      },
+      "scale": {
+        "1": [
+          4,
+          6,
+          7
+        ],
+        "2": [
+          5
+        ],
+        "3": [
+          4,
+          5,
+          7
+        ],
+        "4": [
+          4,
+          6,
+          7
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm6",
+        "Xm7M",
+        "Xm6/9"
+      ],
+      "sourceGroup": "Escala Menor Melódica"
+    },
+    {
+      "name": "Xm_melodic_minor_F4_frente",
+      "scaleType": "melodicMinor",
+      "aliases": [
+        "Menor melódica"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6M",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F4",
+        "string": 4,
+        "fret": 7
+      },
+      "scale": {
+        "1": [
+          7,
+          9,
+          10
+        ],
+        "2": [
+          7,
+          9
+        ],
+        "3": [
+          7,
+          9
+        ],
+        "4": [
+          7,
+          9,
+          10
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm6",
+        "Xm7M",
+        "Xm6/9"
+      ],
+      "sourceGroup": "Escala Menor Melódica"
+    },
+    {
+      "name": "Xm_melodic_minor_F2",
+      "scaleType": "melodicMinor",
+      "aliases": [
+        "Menor melódica"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "5J",
+        "6M",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          9,
+          10,
+          12
+        ],
+        "2": [
+          9,
+          10
+        ],
+        "3": [
+          9,
+          11
+        ],
+        "4": [
+          9,
+          10,
+          12
+        ]
+      },
+      "relatedChords": [
+        "Xm",
+        "Xm6",
+        "Xm7M",
+        "Xm6/9"
+      ],
+      "sourceGroup": "Escala Menor Melódica"
+    },
+    {
+      "name": "X_whole_tone_F2",
+      "scaleType": "wholeTone",
+      "aliases": [
+        "Tons inteiros",
+        "Whole tone"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3M",
+        "b5",
+        "#5",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 1
+      },
+      "scale": {
+        "1": [
+          2,
+          4
+        ],
+        "2": [
+          1,
+          3
+        ],
+        "3": [
+          1,
+          3
+        ],
+        "4": [
+          2,
+          4
+        ]
+      },
+      "relatedChords": [
+        "X7(#5)",
+        "X7(b5)",
+        "X7(#5b5)",
+        "X7alt"
+      ],
+      "sourceGroup": "Escala Tons Inteiros"
+    },
+    {
+      "name": "X_whole_tone_F3",
+      "scaleType": "wholeTone",
+      "aliases": [
+        "Tons inteiros",
+        "Whole tone"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3M",
+        "b5",
+        "#5",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 5
+      },
+      "scale": {
+        "1": [
+          4,
+          6
+        ],
+        "2": [
+          3,
+          5
+        ],
+        "3": [
+          3,
+          5
+        ],
+        "4": [
+          4,
+          6
+        ]
+      },
+      "relatedChords": [
+        "X7(#5)",
+        "X7(b5)",
+        "X7(#5b5)",
+        "X7alt"
+      ],
+      "sourceGroup": "Escala Tons Inteiros"
+    },
+    {
+      "name": "X_whole_tone_F1_tras",
+      "scaleType": "wholeTone",
+      "aliases": [
+        "Tons inteiros",
+        "Whole tone"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3M",
+        "b5",
+        "#5",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F1",
+        "string": 1,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          8,
+          10
+        ],
+        "2": [
+          7,
+          9
+        ],
+        "3": [
+          7,
+          9
+        ],
+        "4": [
+          8,
+          10
+        ]
+      },
+      "relatedChords": [
+        "X7(#5)",
+        "X7(b5)",
+        "X7(#5b5)",
+        "X7alt"
+      ],
+      "sourceGroup": "Escala Tons Inteiros"
+    },
+    {
+      "name": "X_whole_tone_F4_frente",
+      "scaleType": "wholeTone",
+      "aliases": [
+        "Tons inteiros",
+        "Whole tone"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3M",
+        "b5",
+        "#5",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F4",
+        "string": 4,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          10,
+          12
+        ],
+        "2": [
+          9,
+          11
+        ],
+        "3": [
+          9,
+          11
+        ],
+        "4": [
+          10,
+          12
+        ]
+      },
+      "relatedChords": [
+        "X7(#5)",
+        "X7(b5)",
+        "X7(#5b5)",
+        "X7alt"
+      ],
+      "sourceGroup": "Escala Tons Inteiros"
+    },
+    {
+      "name": "X_chromatic_F2_region_0",
+      "scaleType": "chromatic",
+      "aliases": [
+        "Cromática"
+      ],
+      "formula": [
+        "1J",
+        "2m",
+        "2M",
+        "3m",
+        "3M",
+        "4J",
+        "b5",
+        "5J",
+        "#5",
+        "6M",
+        "7m",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 1
+      },
+      "scale": {
+        "1": [
+          0,
+          1,
+          2,
+          3,
+          4
+        ],
+        "2": [
+          0,
+          1,
+          2
+        ],
+        "3": [
+          0,
+          1,
+          2,
+          3
+        ],
+        "4": [
+          1,
+          2,
+          3,
+          4
+        ]
+      },
+      "relatedChords": [
+        "any"
+      ],
+      "sourceGroup": "Escala Cromática"
+    },
+    {
+      "name": "X_chromatic_F2_region_4",
+      "scaleType": "chromatic",
+      "aliases": [
+        "Cromática"
+      ],
+      "formula": [
+        "1J",
+        "2m",
+        "2M",
+        "3m",
+        "3M",
+        "4J",
+        "b5",
+        "5J",
+        "#5",
+        "6M",
+        "7m",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 5
+      },
+      "scale": {
+        "1": [
+          5,
+          6,
+          7,
+          8
+        ],
+        "2": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "3": [
+          4,
+          5,
+          6,
+          7
+        ],
+        "4": [
+          5,
+          6,
+          7,
+          8
+        ]
+      },
+      "relatedChords": [
+        "any"
+      ],
+      "sourceGroup": "Escala Cromática"
+    },
+    {
+      "name": "X_chromatic_F2_region_8",
+      "scaleType": "chromatic",
+      "aliases": [
+        "Cromática"
+      ],
+      "formula": [
+        "1J",
+        "2m",
+        "2M",
+        "3m",
+        "3M",
+        "4J",
+        "b5",
+        "5J",
+        "#5",
+        "6M",
+        "7m",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 9
+      },
+      "scale": {
+        "1": [
+          9,
+          10,
+          11,
+          12
+        ],
+        "2": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "3": [
+          8,
+          9,
+          10,
+          11
+        ],
+        "4": [
+          9,
+          10,
+          11,
+          12
+        ]
+      },
+      "relatedChords": [
+        "any"
+      ],
+      "sourceGroup": "Escala Cromática"
+    },
+    {
+      "name": "X_diminished_F1_region_1",
+      "scaleType": "diminished",
+      "aliases": [
+        "Diminuta",
+        "Diminished"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "b5",
+        "6m",
+        "7dim",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F1",
+        "string": 1,
+        "fret": 1
+      },
+      "scale": {
+        "1": [
+          1,
+          3,
+          4
+        ],
+        "2": [
+          1,
+          2,
+          4
+        ],
+        "3": [
+          1,
+          3
+        ],
+        "4": [
+          1,
+          3,
+          4
+        ]
+      },
+      "relatedChords": [
+        "Xdim",
+        "Xº",
+        "Xm7(b5)",
+        "X7(b9)",
+        "X7(b9b13)"
+      ],
+      "sourceGroup": "Escala Diminuta"
+    },
+    {
+      "name": "X_diminished_F1_region_2",
+      "scaleType": "diminished",
+      "aliases": [
+        "Diminuta",
+        "Diminished"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "b5",
+        "6m",
+        "7dim",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F1",
+        "string": 1,
+        "fret": 4
+      },
+      "scale": {
+        "1": [
+          4,
+          6,
+          7
+        ],
+        "2": [
+          4,
+          5,
+          7
+        ],
+        "3": [
+          4,
+          6
+        ],
+        "4": [
+          4,
+          6,
+          7
+        ]
+      },
+      "relatedChords": [
+        "Xdim",
+        "Xº",
+        "Xm7(b5)",
+        "X7(b9)",
+        "X7(b9b13)"
+      ],
+      "sourceGroup": "Escala Diminuta"
+    },
+    {
+      "name": "X_diminished_F1_region_3",
+      "scaleType": "diminished",
+      "aliases": [
+        "Diminuta",
+        "Diminished"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "b5",
+        "6m",
+        "7dim",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F1",
+        "string": 1,
+        "fret": 7
+      },
+      "scale": {
+        "1": [
+          7,
+          9,
+          10
+        ],
+        "2": [
+          7,
+          8,
+          10
+        ],
+        "3": [
+          7,
+          9
+        ],
+        "4": [
+          7,
+          9,
+          10
+        ]
+      },
+      "relatedChords": [
+        "Xdim",
+        "Xº",
+        "Xm7(b5)",
+        "X7(b9)",
+        "X7(b9b13)"
+      ],
+      "sourceGroup": "Escala Diminuta"
+    },
+    {
+      "name": "X_diminished_F1_region_4",
+      "scaleType": "diminished",
+      "aliases": [
+        "Diminuta",
+        "Diminished"
+      ],
+      "formula": [
+        "1J",
+        "2M",
+        "3m",
+        "4J",
+        "b5",
+        "6m",
+        "7dim",
+        "7M",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F1",
+        "string": 1,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          10,
+          12,
+          13
+        ],
+        "2": [
+          10,
+          11,
+          13
+        ],
+        "3": [
+          10,
+          12
+        ],
+        "4": [
+          10,
+          12,
+          13
+        ]
+      },
+      "relatedChords": [
+        "Xdim",
+        "Xº",
+        "Xm7(b5)",
+        "X7(b9)",
+        "X7(b9b13)"
+      ],
+      "sourceGroup": "Escala Diminuta"
+    },
+    {
+      "name": "X7_dominant_diminished_F2_region_1",
+      "scaleType": "dominant_diminished",
+      "aliases": [
+        "Escala dominante diminuta",
+        "Dominante diminuta",
+        "Diminuta dominante",
+        "Half-whole diminished"
+      ],
+      "formula": [
+        "1J",
+        "2m",
+        "2A",
+        "3M",
+        "4A",
+        "5J",
+        "6M",
+        "7m"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 1
+      },
+      "scale": {
+        "1": [
+          2,
+          4,
+          5
+        ],
+        "2": [
+          2,
+          4
+        ],
+        "3": [
+          2,
+          3,
+          5
+        ],
+        "4": [
+          2,
+          4,
+          5
+        ]
+      },
+      "relatedChords": [
+        "X7",
+        "X7(b9)",
+        "X7(#9)",
+        "X7(b9,#9)",
+        "X7(#11)",
+        "X13(b9)",
+        "X7(13,b9)",
+        "X7(b5)"
+      ],
+      "sourceGroup": "Escala Dominante Diminuta",
+      "usageNotes": "Escala diminuta aplicada 1 semitom acima do acorde dominante."
+    },
+    {
+      "name": "X7_dominant_diminished_F2_region_2",
+      "scaleType": "dominant_diminished",
+      "aliases": [
+        "Escala dominante diminuta",
+        "Dominante diminuta",
+        "Diminuta dominante",
+        "Half-whole diminished"
+      ],
+      "formula": [
+        "1J",
+        "2m",
+        "2A",
+        "3M",
+        "4A",
+        "5J",
+        "6M",
+        "7m"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 4
+      },
+      "scale": {
+        "1": [
+          5,
+          7,
+          8
+        ],
+        "2": [
+          5,
+          7
+        ],
+        "3": [
+          5,
+          6,
+          8
+        ],
+        "4": [
+          5,
+          7,
+          8
+        ]
+      },
+      "relatedChords": [
+        "X7",
+        "X7(b9)",
+        "X7(#9)",
+        "X7(b9,#9)",
+        "X7(#11)",
+        "X13(b9)",
+        "X7(13,b9)",
+        "X7(b5)"
+      ],
+      "sourceGroup": "Escala Dominante Diminuta",
+      "usageNotes": "Escala diminuta aplicada 1 semitom acima do acorde dominante."
+    },
+    {
+      "name": "X7_dominant_diminished_F2_region_3",
+      "scaleType": "dominant_diminished",
+      "aliases": [
+        "Escala dominante diminuta",
+        "Dominante diminuta",
+        "Diminuta dominante",
+        "Half-whole diminished"
+      ],
+      "formula": [
+        "1J",
+        "2m",
+        "2A",
+        "3M",
+        "4A",
+        "5J",
+        "6M",
+        "7m"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 7
+      },
+      "scale": {
+        "1": [
+          8,
+          10,
+          11
+        ],
+        "2": [
+          8,
+          10
+        ],
+        "3": [
+          8,
+          9,
+          11
+        ],
+        "4": [
+          8,
+          10,
+          11
+        ]
+      },
+      "relatedChords": [
+        "X7",
+        "X7(b9)",
+        "X7(#9)",
+        "X7(b9,#9)",
+        "X7(#11)",
+        "X13(b9)",
+        "X7(13,b9)",
+        "X7(b5)"
+      ],
+      "sourceGroup": "Escala Dominante Diminuta",
+      "usageNotes": "Escala diminuta aplicada 1 semitom acima do acorde dominante."
+    },
+    {
+      "name": "X7_dominant_diminished_F2_region_4",
+      "scaleType": "dominant_diminished",
+      "aliases": [
+        "Escala dominante diminuta",
+        "Dominante diminuta",
+        "Diminuta dominante",
+        "Half-whole diminished"
+      ],
+      "formula": [
+        "1J",
+        "2m",
+        "2A",
+        "3M",
+        "4A",
+        "5J",
+        "6M",
+        "7m"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          11,
+          13,
+          14
+        ],
+        "2": [
+          11,
+          13
+        ],
+        "3": [
+          11,
+          12,
+          14
+        ],
+        "4": [
+          11,
+          13,
+          14
+        ]
+      },
+      "relatedChords": [
+        "X7",
+        "X7(b9)",
+        "X7(#9)",
+        "X7(b9,#9)",
+        "X7(#11)",
+        "X13(b9)",
+        "X7(13,b9)",
+        "X7(b5)"
+      ],
+      "sourceGroup": "Escala Dominante Diminuta",
+      "usageNotes": "Escala diminuta aplicada 1 semitom acima do acorde dominante."
+    },
+    {
+      "name": "X7_altered_F2_frente",
+      "scaleType": "altered",
+      "aliases": [
+        "Escala alterada",
+        "Alterada",
+        "Superlócrio",
+        "Melódica menor 1 semitom acima do dominante"
+      ],
+      "formula": [
+        "1J",
+        "9m",
+        "9A",
+        "3M",
+        "5dim",
+        "5aum",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 1
+      },
+      "scale": {
+        "1": [
+          1,
+          2,
+          4
+        ],
+        "2": [
+          1,
+          2
+        ],
+        "3": [
+          1,
+          3
+        ],
+        "4": [
+          1,
+          2,
+          4
+        ]
+      },
+      "relatedChords": [
+        "X7alt",
+        "X7",
+        "X7(b9)",
+        "X7(#9)",
+        "X7(b9,#9)",
+        "X7(b5)",
+        "X7(#5)",
+        "X7(b13)",
+        "X7(#5,b9)",
+        "X7(#5,#9)"
+      ],
+      "sourceGroup": "Escala Alterada",
+      "usageNotes": "Escala menor melódica aplicada 1 semitom acima do acorde dominante."
+    },
+    {
+      "name": "X7_altered_F3",
+      "scaleType": "altered",
+      "aliases": [
+        "Escala alterada",
+        "Alterada",
+        "Superlócrio",
+        "Melódica menor 1 semitom acima do dominante"
+      ],
+      "formula": [
+        "1J",
+        "9m",
+        "9A",
+        "3M",
+        "5dim",
+        "5aum",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F3",
+        "string": 3,
+        "fret": 5
+      },
+      "scale": {
+        "1": [
+          4,
+          6,
+          8
+        ],
+        "2": [
+          4,
+          5
+        ],
+        "3": [
+          5,
+          6
+        ],
+        "4": [
+          4,
+          6,
+          8
+        ]
+      },
+      "relatedChords": [
+        "X7alt",
+        "X7",
+        "X7(b9)",
+        "X7(#9)",
+        "X7(b9,#9)",
+        "X7(b5)",
+        "X7(#5)",
+        "X7(b13)",
+        "X7(#5,b9)",
+        "X7(#5,#9)"
+      ],
+      "sourceGroup": "Escala Alterada",
+      "usageNotes": "Escala menor melódica aplicada 1 semitom acima do acorde dominante."
+    },
+    {
+      "name": "X7_altered_F1_tras",
+      "scaleType": "altered",
+      "aliases": [
+        "Escala alterada",
+        "Alterada",
+        "Superlócrio",
+        "Melódica menor 1 semitom acima do dominante"
+      ],
+      "formula": [
+        "1J",
+        "9m",
+        "9A",
+        "3M",
+        "5dim",
+        "5aum",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F1",
+        "string": 1,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          6,
+          8,
+          10
+        ],
+        "2": [
+          7
+        ],
+        "3": [
+          6,
+          8,
+          9
+        ],
+        "4": [
+          6,
+          8,
+          10
+        ]
+      },
+      "relatedChords": [
+        "X7alt",
+        "X7",
+        "X7(b9)",
+        "X7(#9)",
+        "X7(b9,#9)",
+        "X7(b5)",
+        "X7(#5)",
+        "X7(b13)",
+        "X7(#5,b9)",
+        "X7(#5,#9)"
+      ],
+      "sourceGroup": "Escala Alterada",
+      "usageNotes": "Escala menor melódica aplicada 1 semitom acima do acorde dominante."
+    },
+    {
+      "name": "X7_altered_F4_frente",
+      "scaleType": "altered",
+      "aliases": [
+        "Escala alterada",
+        "Alterada",
+        "Superlócrio",
+        "Melódica menor 1 semitom acima do dominante"
+      ],
+      "formula": [
+        "1J",
+        "9m",
+        "9A",
+        "3M",
+        "5dim",
+        "5aum",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F4",
+        "string": 4,
+        "fret": 10
+      },
+      "scale": {
+        "1": [
+          8,
+          10,
+          11
+        ],
+        "2": [
+          9
+        ],
+        "3": [
+          8,
+          9,
+          11
+        ],
+        "4": [
+          8,
+          10,
+          11
+        ]
+      },
+      "relatedChords": [
+        "X7alt",
+        "X7",
+        "X7(b9)",
+        "X7(#9)",
+        "X7(b9,#9)",
+        "X7(b5)",
+        "X7(#5)",
+        "X7(b13)",
+        "X7(#5,b9)",
+        "X7(#5,#9)"
+      ],
+      "sourceGroup": "Escala Alterada",
+      "usageNotes": "Escala menor melódica aplicada 1 semitom acima do acorde dominante."
+    },
+    {
+      "name": "X7_altered_F2_tras",
+      "scaleType": "altered",
+      "aliases": [
+        "Escala alterada",
+        "Alterada",
+        "Superlócrio",
+        "Melódica menor 1 semitom acima do dominante"
+      ],
+      "formula": [
+        "1J",
+        "9m",
+        "9A",
+        "3M",
+        "5dim",
+        "5aum",
+        "7m",
+        "8J"
+      ],
+      "fundamental": {
+        "code": "F2",
+        "string": 2,
+        "fret": 13
+      },
+      "scale": {
+        "1": [
+          11,
+          13,
+          14
+        ],
+        "2": [
+          11,
+          13
+        ],
+        "3": [
+          11,
+          13
+        ],
+        "4": [
+          11,
+          13,
+          14
+        ]
+      },
+      "relatedChords": [
+        "X7alt",
+        "X7",
+        "X7(b9)",
+        "X7(#9)",
+        "X7(b9,#9)",
+        "X7(b5)",
+        "X7(#5)",
+        "X7(b13)",
+        "X7(#5,b9)",
+        "X7(#5,#9)"
+      ],
+      "sourceGroup": "Escala Alterada",
+      "usageNotes": "Escala menor melódica aplicada 1 semitom acima do acorde dominante."
     }
-  ]
+  ],
+  "metadata": {
+    "totalScales": 60,
+    "lastUpdate": "Incluídas as escalas Dominante Diminuta e Alterada no mesmo padrão do JSON anterior.",
+    "fundamentalCorrection": {
+      "status": "corrected",
+      "description": "Todos os itens agora possuem fundamental.code e o name inclui F1/F2/F3/F4 conforme a corda da bolinha vermelha.",
+      "renamedShapes": {
+        "X_chromatic_region_0": "X_chromatic_F2_region_0",
+        "X_chromatic_region_4": "X_chromatic_F2_region_4",
+        "X_chromatic_region_8": "X_chromatic_F2_region_8",
+        "X_diminished_region_1": "X_diminished_F1_region_1",
+        "X_diminished_region_2": "X_diminished_F1_region_2",
+        "X_diminished_region_3": "X_diminished_F1_region_3",
+        "X_diminished_region_4": "X_diminished_F1_region_4",
+        "X7_dominant_diminished_region_1": "X7_dominant_diminished_F2_region_1",
+        "X7_dominant_diminished_region_2": "X7_dominant_diminished_F2_region_2",
+        "X7_dominant_diminished_region_3": "X7_dominant_diminished_F2_region_3",
+        "X7_dominant_diminished_region_4": "X7_dominant_diminished_F2_region_4"
+      },
+      "totalRenamed": 11
+    }
+  }
 }
