@@ -372,6 +372,7 @@ Funcionalidades atuais:
 - Depois da busca, o usuario escolhe a posicao do acorde que sera usada como referencia.
 - `parseChord` identifica raiz e qualidade do acorde; `arpeggio-search.ts` fornece as posicoes do acorde.
 - `scale-search.ts` usa `chordScaleRelations` e `relatedChords` do JSON para cruzar o acorde digitado com as escalas compativeis.
+- Alem da relacao direta, `scale-search.ts` deriva funcoes modais harmonicas por qualidade de acorde. Exemplo: `C7M` exibe `C Jonio` com escala-mae C maior e `C Lidio` com escala-mae G maior.
 - As opcoes sao mostradas em funcao da corda da fundamental do acorde escolhido (`F1`, `F2`, `F3`, `F4`), nao por rotulos genericos como aberto/baixo/medio/alto.
 - O nome do shape no JSON e a propriedade `fundamental.code` indicam onde esta a tonica. Exemplo: `X_major_F3_tras` usa fundamental em `F3`.
 - A ordem de cordas do JSON e `1=D aguda`, `2=B`, `3=G`, `4=D grave`; a ordem interna do app e DGBD do grave para o agudo, portanto `scale-search.ts` converte para `[4, 3, 2, 1]` antes de renderizar.
@@ -388,7 +389,7 @@ Fonte de dados:
 - `fundamental.string` segue a numeracao do JSON, nao o indice interno do app.
 - `scale` e um objeto com as cordas `"1"`, `"2"`, `"3"` e `"4"` e listas de trastes exatos por corda.
 - O sistema deve respeitar os desenhos do JSON sem acrescentar ou remover notas fora do shape definido.
-- Para `C7M`, o resultado esperado vem de `chordScaleRelations.X7M`, atualmente `X_major` e `X_pentatonic_major`, filtrado pela corda da fundamental da posicao escolhida.
+- Para `C7M`, o resultado esperado inclui as relacoes diretas de `chordScaleRelations.X7M` e as funcoes modais de acorde maior/7M, como Jonio e Lidio, filtrando por regiao sem esconder uma funcao modal inteira quando nao houver shape naquela corda.
 
 Observacoes:
 
