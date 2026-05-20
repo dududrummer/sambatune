@@ -5,7 +5,12 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { INSTRUMENT_PRESETS, parseChord } from '@/lib/music-theory';
-import { searchScaleShapes, type ScaleShapeResult } from '@/lib/scale-search';
+import {
+  getScaleOptionsForPosition,
+  getScalePositions,
+  type ScaleOptionResult,
+  type ScalePosition,
+} from '@/lib/scale-search';
 import { VoicingMiniSvg } from './VoicingMiniSvg';
 import { DiagramLegend } from './DiagramLegend';
 import { CreationSavePanel } from './CreationSavePanel';
@@ -31,7 +36,9 @@ export function ScaleDictionaryPage({
   openedCreation,
 }: Props) {
   const [query, setQuery] = useState('');
-  const [scales, setScales] = useState<ScaleShapeResult[]>([]);
+  const [positions, setPositions] = useState<ScalePosition[]>([]);
+  const [selectedPositionId, setSelectedPositionId] = useState('');
+  const [scaleOptions, setScaleOptions] = useState<ScaleOptionResult[]>([]);
   const [parsedName, setParsedName] = useState('');
   const [error, setError] = useState('');
 
@@ -43,13 +50,20 @@ export function ScaleDictionaryPage({
 
   const activeTuning = useMemo(() => getActiveTuning(), [getActiveTuning]);
 
+  const selectedPosition = useMemo(
+    () => positions.find((position) => position.id === selectedPositionId) ?? null,
+    [positions, selectedPositionId],
+  );
+
   const handleSearch = useCallback(
     (value: string) => {
       setQuery(value);
       setError('');
+      setScaleOptions([]);
 
       if (!value.trim()) {
-        setScales([]);
+        setPositions([]);
+        setSelectedPositionId('');
         setParsedName('');
         return;
       }
@@ -57,24 +71,45 @@ export function ScaleDictionaryPage({
       const parsed = parseChord(value);
       if (!parsed) {
         setError(`Acorde "${value}" não reconhecido. Ex: C, C7M, Am, G7, F#m7`);
-        setScales([]);
+        setPositions([]);
+        setSelectedPositionId('');
         setParsedName('');
         return;
       }
 
-      const results = searchScaleShapes(value.trim(), getActiveTuning());
+      const nextPositions = getScalePositions(value.trim(), getActiveTuning());
       setParsedName(`${parsed.displayName} - ${parsed.qualityName}`);
 
-      if (results.length === 0) {
-        setError('Nenhuma escala encontrada para esse acorde no dicionário atual.');
-        setScales([]);
+      if (nextPositions.length === 0) {
+        setError('Nenhuma posição de acorde encontrada para guiar os shapes de escala.');
+        setPositions([]);
+        setSelectedPositionId('');
         return;
       }
 
-      setScales(results);
+      setPositions(nextPositions);
+      setSelectedPositionId((current) =>
+        nextPositions.some((position) => position.id === current) ? current : nextPositions[0].id,
+      );
     },
     [getActiveTuning],
   );
+
+  useEffect(() => {
+    if (!selectedPosition || !query.trim()) {
+      setScaleOptions([]);
+      return;
+    }
+
+    const options = getScaleOptionsForPosition(query.trim(), activeTuning, selectedPosition);
+    setScaleOptions(options);
+
+    if (options.length === 0) {
+      setError('Nenhuma possibilidade modal encontrada para essa posição no dicionário atual.');
+    } else {
+      setError('');
+    }
+  }, [activeTuning, query, selectedPosition]);
 
   useEffect(() => {
     if (!openedCreation || openedCreation.type !== 'dictionary') return;
@@ -145,60 +180,85 @@ export function ScaleDictionaryPage({
 
         {parsedName && (
           <p className="text-sm font-medium text-primary">
-            {parsedName} - {scales.length} escala(s) compatível(is)
+            {parsedName} - escolha abaixo a posição do acorde
           </p>
         )}
         {error && <p className="text-sm text-destructive">{error}</p>}
 
-        {scales.length > 0 && (
+        {positions.length > 0 && (
+          <div className="space-y-3">
+            <Label className="text-xs text-muted-foreground">
+              Posição do acorde usada como referência da escala
+            </Label>
+            <div className="flex flex-wrap gap-4">
+              {positions.map((position) => {
+                const selected = position.id === selectedPositionId;
+                return (
+                  <button
+                    key={position.id}
+                    type="button"
+                    onClick={() => setSelectedPositionId(position.id)}
+                    className={`rounded-lg border-2 bg-white dark:bg-zinc-900 transition-all hover:scale-105 ${
+                      selected ? 'border-emerald-500 shadow-md scale-105' : 'border-border hover:border-emerald-500/60'
+                    }`}
+                    title={`${parsedName} - nota mais grave ${position.lowestNote}`}
+                  >
+                    <div className="px-2 pt-2 text-center text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
+                      {position.lowestNote} no baixo
+                    </div>
+                    <VoicingMiniSvg
+                      voicing={position.voicing}
+                      stringCount={activeTuning.length}
+                      markerColor={markerColor}
+                      primaryColor={primaryColor}
+                      renderMode="chord"
+                      width={88}
+                      height={126}
+                    />
+                  </button>
+                );
+              })}
+            </div>
+          </div>
+        )}
+
+        {scaleOptions.length > 0 && selectedPosition && (
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <Label className="text-xs text-muted-foreground">
-                Escalas disponíveis por região
+                Possibilidades para essa posição
               </Label>
-              <DiagramLegend
-                showArpeggio
-                arpeggioLabel="Escala"
-                arpeggioColor="#10b981"
-              />
+              <DiagramLegend showArpeggio arpeggioLabel="Escala" arpeggioColor="#10b981" />
             </div>
 
-            {scales.map((scale) => (
+            {scaleOptions.map((scale) => (
               <section key={scale.id} className="rounded-lg border bg-card p-3 space-y-3">
                 <div className="flex flex-wrap items-start justify-between gap-2">
                   <div>
                     <h3 className="text-sm font-bold">{scale.name}</h3>
+                    <p className="text-[11px] text-muted-foreground">
+                      {scale.description} Parent scale: {scale.parentScaleName}
+                    </p>
                     <p className="text-[11px] text-muted-foreground font-mono">
                       {scale.noteNames.join(' - ')}
                     </p>
                   </div>
                   <span className="rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
-                    {scale.shortName}
+                    {scale.formLabel}
                   </span>
                 </div>
 
-                <div className="flex flex-wrap gap-4">
-                  {scale.shapes.map(({ region, voicing }) => (
-                    <div
-                      key={`${scale.id}-${region.id}`}
-                      className="rounded-lg border-2 border-border bg-white dark:bg-zinc-900 hover:border-emerald-500/60 transition-all hover:scale-105"
-                      title={`${scale.name} - ${region.label}`}
-                    >
-                      <div className="px-2 pt-2 text-center text-[10px] font-bold text-emerald-700 dark:text-emerald-300">
-                        {region.label}
-                      </div>
-                      <VoicingMiniSvg
-                        voicing={voicing}
-                        stringCount={activeTuning.length}
-                        markerColor={markerColor}
-                        primaryColor={primaryColor}
-                        arpeggioColor="#10b981"
-                        renderMode="arpeggio"
-                        width={88}
-                        height={126}
-                      />
-                    </div>
-                  ))}
+                <div className="inline-flex rounded-lg border-2 border-border bg-white dark:bg-zinc-900">
+                  <VoicingMiniSvg
+                    voicing={scale.voicing}
+                    stringCount={activeTuning.length}
+                    markerColor={markerColor}
+                    primaryColor={primaryColor}
+                    arpeggioColor="#10b981"
+                    renderMode="arpeggio"
+                    width={108}
+                    height={146}
+                  />
                 </div>
               </section>
             ))}
@@ -209,14 +269,15 @@ export function ScaleDictionaryPage({
           type="dictionary"
           defaultTitle={parsedName || query || 'Minhas escalas'}
           defaultDescription="Escalas salvas a partir do dicionário de escalas."
-          disabled={scales.length === 0}
+          disabled={scaleOptions.length === 0}
           payload={{
             mode: 'scales',
             query,
             parsedName,
             instrument,
             tuning: activeTuning,
-            scales,
+            selectedPositionId,
+            scaleOptions,
           }}
         />
       </CardContent>

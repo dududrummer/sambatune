@@ -1,149 +1,265 @@
 import scaleShapesRaw from '../../diagramas/Shapes e arpejos/shapes_escalas.json';
-import {
-  CHROMATIC_NOTES,
-  getNoteIndex,
-  noteIndexAtFret,
-  parseChord,
-} from './music-theory';
+import { CHROMATIC_NOTES, getNoteIndex, noteIndexAtFret, parseChord } from './music-theory';
+import { searchVoicings } from './arpeggio-search';
 import type { Voicing } from './chord-finder';
 
-interface ScaleDefinition {
+type ShapeByString = Record<'1' | '2' | '3' | '4', number[]>;
+
+interface ModeOptionDefinition {
   id: string;
   name: string;
-  shortName: string;
-  intervals: number[];
-  qualities: string[];
+  scaleDegree: number;
+  parentScaleOffset: number;
+  formMode: string;
+  formRootOffset: number;
+  description: string;
 }
 
-interface ScaleRegion {
+interface ModeShapeDefinition {
   id: string;
-  label: string;
-  startFret: number;
-  endFret: number;
+  mode: string;
+  formula: number[];
+  shape: ShapeByString;
 }
 
 interface ScaleShapesConfig {
-  regions: ScaleRegion[];
-  scales: ScaleDefinition[];
+  modesByChordQuality: Record<string, ModeOptionDefinition[]>;
+  modeShapes: ModeShapeDefinition[];
 }
 
-export interface ScaleShapeResult {
+export interface ScalePosition {
+  id: string;
+  label: string;
+  voicing: Voicing;
+  lowestString: number;
+  lowestFret: number;
+  lowestNote: string;
+}
+
+export interface ScaleOptionResult {
   id: string;
   name: string;
-  shortName: string;
-  root: string;
+  parentScaleName: string;
+  formLabel: string;
+  description: string;
   noteNames: string[];
-  intervals: number[];
-  shapes: Array<{
-    region: ScaleRegion;
-    voicing: Voicing;
-  }>;
+  voicing: Voicing;
 }
 
 const SCALE_CONFIG = scaleShapesRaw as ScaleShapesConfig;
+
+const MODE_FORMULAS: Record<string, number[]> = {
+  ionian: [0, 2, 4, 5, 7, 9, 11],
+  lydian: [0, 2, 4, 6, 7, 9, 11],
+  mixolydian: [0, 2, 4, 5, 7, 9, 10],
+  'lydian-dominant': [0, 2, 4, 6, 7, 9, 10],
+  altered: [0, 1, 3, 4, 6, 8, 10],
+  dorian: [0, 2, 3, 5, 7, 9, 10],
+  aeolian: [0, 2, 3, 5, 7, 8, 10],
+  locrian: [0, 1, 3, 5, 6, 8, 10],
+  diminished: [0, 2, 3, 5, 6, 8, 9, 11],
+  'major-pentatonic': [0, 2, 4, 7, 9],
+  'minor-pentatonic': [0, 3, 5, 7, 10],
+};
+
+const DIATONIC_MODE_BY_INTERVAL: Record<number, string> = {
+  0: 'Jonio',
+  2: 'Dorico',
+  4: 'Frigio',
+  5: 'Lidio',
+  7: 'Mixolidio',
+  9: 'Eolio',
+  11: 'Locrio',
+};
 
 function normalizeInterval(interval: number): number {
   return ((interval % 12) + 12) % 12;
 }
 
-function uniqueSorted(values: number[]): number[] {
-  return [...new Set(values)].sort((a, b) => a - b);
+function noteName(index: number): string {
+  return CHROMATIC_NOTES[normalizeInterval(index)] ?? 'C';
 }
 
-function scaleMatchesChord(scale: ScaleDefinition, chordIntervals: number[], qualityName: string) {
-  if (scale.qualities.includes(qualityName)) return true;
-  return chordIntervals.every((interval) => scale.intervals.includes(interval));
+function getQualityBucket(qualityName: string): string {
+  if (qualityName.includes('Menor 7b5') || qualityName.includes('Menor b5')) return 'halfDiminished';
+  if (qualityName.includes('Diminuto')) return 'diminished';
+  if (qualityName.includes('Dominante')) return 'dominant';
+  if (qualityName.includes('Menor 7')) return 'minor7';
+  if (qualityName.includes('Menor')) return 'minor';
+  if (qualityName.includes('Maior 7')) return 'major7';
+  if (qualityName.includes('Maior') || qualityName === 'Add9') return 'major';
+  return 'major';
 }
 
-function buildScaleVoicing(
-  scale: ScaleDefinition,
-  rootIndex: number,
+function getModeShape(mode: string): ModeShapeDefinition | undefined {
+  return SCALE_CONFIG.modeShapes.find((shape) => shape.mode === mode);
+}
+
+function getLowestPlayedNote(voicing: Voicing, tuning: string[]): {
+  string: number;
+  fret: number;
+  noteIndex: number;
+} | null {
+  for (let stringIndex = 0; stringIndex < voicing.frets.length; stringIndex++) {
+    const fret = voicing.frets[stringIndex];
+    if (fret < 0) continue;
+    const openIndex = getNoteIndex(tuning[stringIndex]);
+    if (openIndex === -1) continue;
+    return {
+      string: stringIndex,
+      fret,
+      noteIndex: noteIndexAtFret(openIndex, fret),
+    };
+  }
+  return null;
+}
+
+function fretListToChordFrets(shape: number[][]): number[] {
+  return shape.map((stringFrets) => stringFrets[0] ?? -1);
+}
+
+function findRootInShape(
+  scaleFrets: number[][],
   tuning: string[],
-  region: ScaleRegion,
-): Voicing | null {
-  const scaleNotes = new Set(scale.intervals.map((interval) => (rootIndex + interval) % 12));
-  const scaleFrets = tuning.map((openNote) => {
-    const openIndex = getNoteIndex(openNote);
-    if (openIndex === -1) return [];
-
-    const frets: number[] = [];
-    for (let fret = region.startFret; fret <= region.endFret; fret++) {
-      if (scaleNotes.has(noteIndexAtFret(openIndex, fret))) {
-        frets.push(fret);
-      }
-    }
-    return frets;
-  });
-
-  if (!scaleFrets.some((stringFrets) => stringFrets.length > 0)) return null;
-
-  let rootString: number | undefined;
-  let rootFret: number | undefined;
+  rootIndex: number,
+  preferred?: { string?: number; fret?: number },
+) {
+  const matches: Array<{ string: number; fret: number; distance: number }> = [];
 
   for (let stringIndex = 0; stringIndex < scaleFrets.length; stringIndex++) {
-    const fret = scaleFrets[stringIndex].find((candidate) => {
-      const openIndex = getNoteIndex(tuning[stringIndex]);
-      return openIndex !== -1 && noteIndexAtFret(openIndex, candidate) === rootIndex;
-    });
-    if (fret !== undefined) {
-      rootString = stringIndex;
-      rootFret = fret;
-      break;
+    const openIndex = getNoteIndex(tuning[stringIndex]);
+    if (openIndex === -1) continue;
+
+    for (const fret of scaleFrets[stringIndex]) {
+      if (noteIndexAtFret(openIndex, fret) !== rootIndex) continue;
+      const distance =
+        Math.abs(fret - (preferred?.fret ?? fret)) +
+        Math.abs(stringIndex - (preferred?.string ?? stringIndex));
+      matches.push({ string: stringIndex, fret, distance });
     }
   }
 
-  const fallbackFrets = scaleFrets.map((stringFrets) => stringFrets[0] ?? -1);
-  const pressed = fallbackFrets.filter((fret) => fret > 0);
-  const startingFret = region.startFret === 0 ? 1 : region.startFret;
+  return matches.sort((a, b) => a.distance - b.distance)[0];
+}
+
+function buildStrictScaleVoicing(
+  modeShape: ModeShapeDefinition,
+  anchorFret: number,
+  tuning: string[],
+  chordRootIndex: number,
+  selectedChord: Voicing,
+): Voicing | null {
+  const scaleFrets = [
+    modeShape.shape['1'].map((fret) => fret + anchorFret),
+    modeShape.shape['2'].map((fret) => fret + anchorFret),
+    modeShape.shape['3'].map((fret) => fret + anchorFret),
+    modeShape.shape['4'].map((fret) => fret + anchorFret),
+  ].map((stringFrets) => stringFrets.filter((fret) => fret >= 0));
+
+  if (!scaleFrets.some((stringFrets) => stringFrets.length > 0)) return null;
+
+  const fallbackFrets = fretListToChordFrets(scaleFrets);
+  const pressed = scaleFrets.flat().filter((fret) => fret > 0);
+  const minPressed = pressed.length > 0 ? Math.min(...pressed) : 1;
+  const root = findRootInShape(scaleFrets, tuning, chordRootIndex, {
+    string: selectedChord.rootString,
+    fret: selectedChord.rootFret,
+  });
 
   return {
     frets: fallbackFrets,
-    startingFret,
+    startingFret: Math.max(1, minPressed),
     barres: [],
     mutedStrings: fallbackFrets
       .map((fret, index) => (fret === -1 ? index : -1))
       .filter((index) => index !== -1),
     omitted: [],
-    fingerCount: pressed.length,
+    fingerCount: fallbackFrets.filter((fret) => fret > 0).length,
     arpeggioFrets: scaleFrets,
-    rootString,
-    rootFret,
+    rootString: root?.string,
+    rootFret: root?.fret,
   };
 }
 
-export function searchScaleShapes(chordName: string, tuning: string[]): ScaleShapeResult[] {
+function getFormModeForLowestNote(option: ModeOptionDefinition, lowestNoteIndex: number, chordRootIndex: number) {
+  const formula = MODE_FORMULAS[option.id];
+  if (!formula) return option.formMode;
+
+  const intervalFromChordRoot = normalizeInterval(lowestNoteIndex - chordRootIndex);
+  if (formula.includes(intervalFromChordRoot)) {
+    if (formula.length === 7 && DIATONIC_MODE_BY_INTERVAL[intervalFromChordRoot]) {
+      return DIATONIC_MODE_BY_INTERVAL[intervalFromChordRoot];
+    }
+    return option.name;
+  }
+
+  return option.formMode;
+}
+
+export function getScalePositions(chordName: string, tuning: string[]): ScalePosition[] {
+  const voicings = searchVoicings(chordName, { instrument: 'cavaquinho', tuning });
+
+  return voicings
+    .map((voicing, index) => {
+      const lowest = getLowestPlayedNote(voicing, tuning);
+      if (!lowest) return null;
+      return {
+        id: `${voicing.startingFret}-${voicing.frets.join('-')}-${index}`,
+        label: `Fundamental ${voicing.rootString !== undefined ? `corda ${voicing.rootString + 1}` : 'detectada'}`,
+        voicing,
+        lowestString: lowest.string,
+        lowestFret: lowest.fret,
+        lowestNote: noteName(lowest.noteIndex),
+      };
+    })
+    .filter((position): position is ScalePosition => position !== null);
+}
+
+export function getScaleOptionsForPosition(
+  chordName: string,
+  tuning: string[],
+  position: ScalePosition,
+): ScaleOptionResult[] {
   const parsed = parseChord(chordName);
   if (!parsed) return [];
 
-  const rootIndex = getNoteIndex(parsed.root);
-  if (rootIndex === -1) return [];
+  const chordRootIndex = getNoteIndex(parsed.root);
+  if (chordRootIndex === -1) return [];
 
-  const chordIntervals = uniqueSorted(
-    parsed.noteIndices.map((noteIndex) => normalizeInterval(noteIndex - rootIndex)),
-  );
+  const qualityBucket = getQualityBucket(parsed.qualityName);
+  const options = SCALE_CONFIG.modesByChordQuality[qualityBucket] ?? [];
+  const lowestOpenIndex = getNoteIndex(tuning[position.lowestString]);
+  const lowestNoteIndex =
+    lowestOpenIndex === -1 ? chordRootIndex : noteIndexAtFret(lowestOpenIndex, position.lowestFret);
 
-  return SCALE_CONFIG.scales
-    .filter((scale) => scaleMatchesChord(scale, chordIntervals, parsed.qualityName))
-    .map((scale) => {
-      const noteNames = scale.intervals.map(
-        (interval) => CHROMATIC_NOTES[(rootIndex + interval) % 12],
+  return options
+    .map((option) => {
+      const formMode = getFormModeForLowestNote(option, lowestNoteIndex, chordRootIndex);
+      const modeShape = getModeShape(formMode) ?? getModeShape(option.formMode);
+      if (!modeShape) return null;
+
+      const voicing = buildStrictScaleVoicing(
+        modeShape,
+        position.lowestFret,
+        tuning,
+        chordRootIndex,
+        position.voicing,
       );
-      const shapes = SCALE_CONFIG.regions
-        .map((region) => {
-          const voicing = buildScaleVoicing(scale, rootIndex, tuning, region);
-          return voicing ? { region, voicing } : null;
-        })
-        .filter((shape): shape is { region: ScaleRegion; voicing: Voicing } => shape !== null);
+      if (!voicing) return null;
+
+      const formula = MODE_FORMULAS[option.id] ?? modeShape.formula;
+      const noteNames = formula.map((interval) => noteName(chordRootIndex + interval));
+      const parentScaleRoot = noteName(chordRootIndex + option.parentScaleOffset);
 
       return {
-        id: scale.id,
-        name: `${parsed.root} ${scale.name}`,
-        shortName: scale.shortName,
-        root: parsed.root,
+        id: `${option.id}-${position.id}`,
+        name: `${parsed.root} ${option.name}`,
+        parentScaleName: `${parentScaleRoot} maior`,
+        formLabel: `Forma de ${position.lowestNote} ${formMode}`,
+        description: option.description,
         noteNames,
-        intervals: scale.intervals,
-        shapes,
+        voicing,
       };
     })
-    .filter((result) => result.shapes.length > 0);
+    .filter((result): result is ScaleOptionResult => result !== null);
 }

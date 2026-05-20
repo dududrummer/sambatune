@@ -369,20 +369,23 @@ Funcionalidades atuais:
 - Aba propria em `/app`: `scales`.
 - Entrada na sidebar logo abaixo de `Dicionario de Arpejos`.
 - Busca por acorde/qualidade, por exemplo `C7M`.
-- `parseChord` identifica raiz e qualidade do acorde.
-- `scale-search.ts` cruza a qualidade/intervalos do acorde com escalas compativeis.
-- Cada escala encontrada mostra notas e shapes por regiao do braco.
+- Depois da busca, o usuario escolhe a posicao do acorde que sera usada como referencia.
+- `parseChord` identifica raiz e qualidade do acorde; `arpeggio-search.ts` fornece as posicoes do acorde.
+- `scale-search.ts` cruza a qualidade do acorde com possibilidades modais compativeis.
+- As opcoes sao mostradas em funcao da nota mais grave do shape escolhido, nao por rotulos genericos como aberto/baixo/medio/alto.
+- Exemplo: em `C7M`, se a posicao escolhida tem `E` como nota mais grave, o modo jonio de C aparece como forma de `E Frigio`, porque usa as mesmas notas da escala de Do.
 - O mini-diagrama usa `VoicingMiniSvg` em `renderMode="arpeggio"` para desenhar varias notas por corda, com cor verde para escala e fundamental em vermelho.
 
 Fonte de dados:
 
-- O arquivo `diagramas/Shapes e arpejos/shapes_escalas.json` define regioes do braco, nomes de escala, intervalos e qualidades de acorde compativeis.
-- Para `C7M`, o resultado esperado inclui opcoes compativeis com acordes maiores/7M, como maior, lidia e pentatonica maior.
+- O arquivo `diagramas/Shapes e arpejos/shapes_escalas.json` define possibilidades por qualidade de acorde e shapes modais estritos.
+- O sistema deve respeitar os desenhos do JSON sem acrescentar notas fora do shape definido.
+- Para `C7M`, o resultado esperado inclui opcoes compativeis com acordes maiores/7M, como jonio e lidio.
 
 Observacoes:
 
 - Ainda nao ha salvamento/publicacao propria para escalas.
-- Se o dicionario crescer com shapes manuais especificos, manter o mesmo contrato de `regions` e `scales`.
+- Se o dicionario crescer com shapes manuais especificos, manter o contrato de `modesByChordQuality` e `modeShapes`.
 
 ## 11. Parser Musical
 
