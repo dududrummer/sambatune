@@ -1,9 +1,9 @@
-import scaleShapesRaw from '../../diagramas/Shapes e arpejos/shapes_escalas.json';
-import { CHROMATIC_NOTES, getNoteIndex, noteIndexAtFret, parseChord } from './music-theory';
-import { searchVoicings } from './arpeggio-search';
-import type { Voicing } from './chord-finder';
+import scaleShapesRaw from "../../diagramas/Shapes e arpejos/shapes_escalas.json";
+import { CHROMATIC_NOTES, getNoteIndex, noteIndexAtFret, parseChord } from "./music-theory";
+import { searchVoicings } from "./arpeggio-search";
+import type { Voicing } from "./chord-finder";
 
-type JsonStringKey = '1' | '2' | '3' | '4';
+type JsonStringKey = "1" | "2" | "3" | "4";
 type ShapeByJsonString = Record<JsonStringKey, number[]>;
 
 interface ScaleShapeEntry {
@@ -66,18 +66,18 @@ const JSON_STRING_TO_APP_STRING: Record<number, number> = {
   4: 0,
 };
 
-const APP_STRING_TO_F_CODE = ['F4', 'F3', 'F2', 'F1'] as const;
+const APP_STRING_TO_F_CODE = ["F4", "F3", "F2", "F1"] as const;
 
 const MAJOR_SCALE_INTERVALS = [0, 2, 4, 5, 7, 9, 11] as const;
 
 const GREEK_MODE_BY_DEGREE = [
-  { prefix: 'X_ionian_F1_F4', modeName: 'Jônio', parentRootOffset: 0 },
-  { prefix: 'X_dorian_F2', modeName: 'Dórico', parentRootOffset: 10 },
-  { prefix: 'X_phrygian_F3', modeName: 'Frígio', parentRootOffset: 8 },
-  { prefix: 'X_lydian_F3', modeName: 'Lídio', parentRootOffset: 7 },
-  { prefix: 'X_mixolydian_F3', modeName: 'Mixolídio', parentRootOffset: 5 },
-  { prefix: 'X_aeolian_F4', modeName: 'Eólio', parentRootOffset: 3 },
-  { prefix: 'X_locrian_F1_F4', modeName: 'Lócrio', parentRootOffset: 1 },
+  { prefix: "X_ionian_F1_F4", modeName: "Jônio", parentRootOffset: 0 },
+  { prefix: "X_dorian_F2", modeName: "Dórico", parentRootOffset: 10 },
+  { prefix: "X_phrygian_F3", modeName: "Frígio", parentRootOffset: 8 },
+  { prefix: "X_lydian_F3", modeName: "Lídio", parentRootOffset: 7 },
+  { prefix: "X_mixolydian_F3", modeName: "Mixolídio", parentRootOffset: 5 },
+  { prefix: "X_aeolian_F4", modeName: "Eólio", parentRootOffset: 3 },
+  { prefix: "X_locrian_F1_F4", modeName: "Lócrio", parentRootOffset: 1 },
 ] as const;
 
 const GREEK_MODE_PREFIXES = new Set<string>(GREEK_MODE_BY_DEGREE.map((mode) => mode.prefix));
@@ -87,11 +87,13 @@ function normalizeInterval(interval: number): number {
 }
 
 function noteName(index: number): string {
-  return CHROMATIC_NOTES[normalizeInterval(index)] ?? 'C';
+  return CHROMATIC_NOTES[normalizeInterval(index)] ?? "C";
 }
 
 function getMajorScaleDegree(parentRootIndex: number, noteIndex: number): number {
-  return MAJOR_SCALE_INTERVALS.indexOf(normalizeInterval(noteIndex - parentRootIndex) as typeof MAJOR_SCALE_INTERVALS[number]);
+  return MAJOR_SCALE_INTERVALS.indexOf(
+    normalizeInterval(noteIndex - parentRootIndex) as (typeof MAJOR_SCALE_INTERVALS)[number],
+  );
 }
 
 function isGreekModeUsage(usage: ScaleUsage): boolean {
@@ -114,18 +116,23 @@ function getRegionalGreekMode(
   if (!isGreekModeUsage(usage)) {
     return {
       shapePrefix: usage.shapePrefix,
-      shapeRootIndex: normalizeInterval(parentRootIndex - usage.parentRootOffset + usage.shapeRootOffset),
+      shapeRootIndex: normalizeInterval(
+        parentRootIndex - usage.parentRootOffset + usage.shapeRootOffset,
+      ),
       regionLabel: null,
     };
   }
 
   const positionNoteIndex = getNoteIndex(position.lowestNote);
-  const degreeIndex = positionNoteIndex === -1 ? -1 : getMajorScaleDegree(parentRootIndex, positionNoteIndex);
+  const degreeIndex =
+    positionNoteIndex === -1 ? -1 : getMajorScaleDegree(parentRootIndex, positionNoteIndex);
 
   if (degreeIndex === -1) {
     return {
       shapePrefix: usage.shapePrefix,
-      shapeRootIndex: normalizeInterval(parentRootIndex - usage.parentRootOffset + usage.shapeRootOffset),
+      shapeRootIndex: normalizeInterval(
+        parentRootIndex - usage.parentRootOffset + usage.shapeRootOffset,
+      ),
       regionLabel: null,
     };
   }
@@ -138,7 +145,10 @@ function getRegionalGreekMode(
   };
 }
 
-function getLowestPlayedNote(voicing: Voicing, tuning: string[]): {
+function getLowestPlayedNote(
+  voicing: Voicing,
+  tuning: string[],
+): {
   string: number;
   fret: number;
   noteIndex: number;
@@ -165,15 +175,26 @@ function getReferenceRootIndex(shape: ScaleShapeEntry): number {
   return noteIndexAtFret(openIndex, shape.fundamental.fret);
 }
 
-function getNearestTransposeDelta(sourceIndex: number, targetIndex: number, minFret: number): number {
-  let delta = normalizeInterval(targetIndex - sourceIndex);
-  if (delta > 6) delta -= 12;
-  if (minFret + delta < 0) delta += 12;
-  return delta;
+function getNearestTransposeDelta(
+  sourceIndex: number,
+  targetIndex: number,
+  scaleMinFret: number,
+  targetMinFret: number,
+): number {
+  const delta = normalizeInterval(targetIndex - sourceIndex);
+
+  const k = Math.round((targetMinFret - scaleMinFret - delta) / 12);
+  let bestDelta = delta + 12 * k;
+
+  if (scaleMinFret + bestDelta < 0) {
+    bestDelta += 12;
+  }
+
+  return bestDelta;
 }
 
 function getRootMatcher(root: string): RegExp {
-  return new RegExp(`^${root.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}`);
+  return new RegExp(`^${root.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")}`);
 }
 
 function getGenericChordSymbols(chordName: string): string[] {
@@ -181,33 +202,33 @@ function getGenericChordSymbols(chordName: string): string[] {
   if (!parsed) return [];
 
   const displayQuality = parsed.displayName
-    .replace(getRootMatcher(parsed.root), '')
-    .replace(/\/[A-G][b#]?$/, '');
+    .replace(getRootMatcher(parsed.root), "")
+    .replace(/\/[A-G][b#]?$/, "");
 
   const symbols = new Set<string>();
   symbols.add(`X${displayQuality}`);
 
   const byQualityName: Record<string, string[]> = {
-    Maior: ['X'],
-    'Maior 6': ['X6'],
-    'Maior 6/9': ['X6/9'],
-    'Maior 7': ['X7M'],
-    Add9: ['Xadd9', 'X'],
-    Menor: ['Xm'],
-    'Menor 7': ['Xm7'],
-    'Menor 6': ['Xm6'],
-    'Menor com Maior 7': ['Xm7M'],
-    'Menor 7b5 (ø)': ['Xm7(b5)'],
-    Diminuto: ['Xdim', 'X°'],
-    'Diminuto 7': ['Xdim', 'X°'],
-    'Dominante 7': ['X7'],
-    'Dominante 9': ['X7'],
-    'Dominante 13': ['X7'],
-    'Dominante 7(#5)': ['X7(#5)'],
-    'Dominante 7(b5)': ['X7(b5)'],
-    'Dominante 7(b9)': ['X7(b9)'],
-    'Dominante 7(#9)': ['X7(#9)'],
-    'Dominante 7 Alt': ['X7alt'],
+    Maior: ["X"],
+    "Maior 6": ["X6"],
+    "Maior 6/9": ["X6/9"],
+    "Maior 7": ["X7M"],
+    Add9: ["Xadd9", "X"],
+    Menor: ["Xm"],
+    "Menor 7": ["Xm7"],
+    "Menor 6": ["Xm6"],
+    "Menor com Maior 7": ["Xm7M"],
+    "Menor 7b5 (ø)": ["Xm7(b5)"],
+    Diminuto: ["Xdim", "X°"],
+    "Diminuto 7": ["Xdim", "X°"],
+    "Dominante 7": ["X7"],
+    "Dominante 9": ["X7"],
+    "Dominante 13": ["X7"],
+    "Dominante 7(#5)": ["X7(#5)"],
+    "Dominante 7(b5)": ["X7(b5)"],
+    "Dominante 7(b9)": ["X7(b9)"],
+    "Dominante 7(#9)": ["X7(#9)"],
+    "Dominante 7 Alt": ["X7alt"],
   };
 
   for (const symbol of byQualityName[parsed.qualityName] ?? []) {
@@ -215,17 +236,17 @@ function getGenericChordSymbols(chordName: string): string[] {
   }
 
   const normalizedQuality = displayQuality
-    .replace(/7#5/g, '7(#5)')
-    .replace(/7b5/g, '7(b5)')
-    .replace(/7b9/g, '7(b9)')
-    .replace(/7#9/g, '7(#9)')
-    .replace(/7alt/i, '7alt')
-    .replace(/^dim7?$/, 'dim')
-    .replace(/^°$/, '°');
+    .replace(/7#5/g, "7(#5)")
+    .replace(/7b5/g, "7(b5)")
+    .replace(/7b9/g, "7(b9)")
+    .replace(/7#9/g, "7(#9)")
+    .replace(/7alt/i, "7alt")
+    .replace(/^dim7?$/, "dim")
+    .replace(/^°$/, "°");
 
   symbols.add(`X${normalizedQuality}`);
 
-  return [...symbols].filter((symbol) => symbol !== 'Xundefined');
+  return [...symbols].filter((symbol) => symbol !== "Xundefined");
 }
 
 function getRelatedScalePrefixes(genericSymbols: string[]): string[] {
@@ -244,7 +265,9 @@ function addUsage(usages: ScaleUsage[], next: ScaleUsage) {
   const key = `${next.id}-${next.shapePrefix}-${next.shapeRootOffset}-${next.parentRootOffset}`;
   if (
     usages.some(
-      (usage) => `${usage.id}-${usage.shapePrefix}-${usage.shapeRootOffset}-${usage.parentRootOffset}` === key,
+      (usage) =>
+        `${usage.id}-${usage.shapePrefix}-${usage.shapeRootOffset}-${usage.parentRootOffset}` ===
+        key,
     )
   ) {
     return;
@@ -256,216 +279,216 @@ function getModalUsages(genericSymbols: string[]): ScaleUsage[] {
   const usages: ScaleUsage[] = [];
   const has = (symbol: string) => genericSymbols.includes(symbol);
 
-  if (['X', 'X6', 'X6/9', 'Xadd9', 'X7M'].some(has)) {
+  if (["X", "X6", "X6/9", "Xadd9", "X7M"].some(has)) {
     addUsage(usages, {
-      id: 'ionian',
-      modeName: 'Jônio',
-      shapePrefix: 'X_ionian_F1_F4',
+      id: "ionian",
+      modeName: "Jônio",
+      shapePrefix: "X_ionian_F1_F4",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: '1º grau da escala maior',
+      description: "1º grau da escala maior",
     });
     addUsage(usages, {
-      id: 'lydian',
-      modeName: 'Lídio',
-      shapePrefix: 'X_lydian_F3',
+      id: "lydian",
+      modeName: "Lídio",
+      shapePrefix: "X_lydian_F3",
       shapeRootOffset: 0,
       parentRootOffset: 7,
-      description: '4º grau da escala maior',
+      description: "4º grau da escala maior",
     });
     addUsage(usages, {
-      id: 'major-pentatonic',
-      modeName: 'Pentatônica maior',
-      shapePrefix: 'X_pentatonic_major',
+      id: "major-pentatonic",
+      modeName: "Pentatônica maior",
+      shapePrefix: "X_pentatonic_major",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: 'Pentatônica maior da fundamental',
+      description: "Pentatônica maior da fundamental",
     });
     addUsage(usages, {
-      id: 'major-blues',
-      modeName: 'Blues maior',
-      shapePrefix: 'X_blues_major',
+      id: "major-blues",
+      modeName: "Blues maior",
+      shapePrefix: "X_blues_major",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: 'Blues maior da fundamental',
+      description: "Blues maior da fundamental",
     });
   }
 
-  if (['X7', 'X9', 'X13', 'X7(#5)', 'X7(b5)', 'X7(b9)', 'X7(#9)', 'X7alt'].some(has)) {
+  if (["X7", "X9", "X13", "X7(#5)", "X7(b5)", "X7(b9)", "X7(#9)", "X7alt"].some(has)) {
     addUsage(usages, {
-      id: 'mixolydian',
-      modeName: 'Mixolídio',
-      shapePrefix: 'X_mixolydian_F3',
+      id: "mixolydian",
+      modeName: "Mixolídio",
+      shapePrefix: "X_mixolydian_F3",
       shapeRootOffset: 0,
       parentRootOffset: 5,
-      description: '5º grau da escala maior',
+      description: "5º grau da escala maior",
     });
     addUsage(usages, {
-      id: 'lydian-dominant',
-      modeName: 'Lídio dominante',
-      shapePrefix: 'Xm_melodic_minor',
+      id: "lydian-dominant",
+      modeName: "Lídio dominante",
+      shapePrefix: "Xm_melodic_minor",
       shapeRootOffset: 7,
       parentRootOffset: 7,
-      description: '4º grau da escala menor melódica',
+      description: "4º grau da escala menor melódica",
     });
     addUsage(usages, {
-      id: 'altered',
-      modeName: 'Alterada',
-      shapePrefix: 'X7_altered',
+      id: "altered",
+      modeName: "Alterada",
+      shapePrefix: "X7_altered",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: 'Escala alterada da fundamental',
+      description: "Escala alterada da fundamental",
     });
     addUsage(usages, {
-      id: 'dominant-diminished',
-      modeName: 'Dominante diminuta',
-      shapePrefix: 'X7_dominant_diminished',
+      id: "dominant-diminished",
+      modeName: "Dominante diminuta",
+      shapePrefix: "X7_dominant_diminished",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: 'Dominante diminuta da fundamental',
+      description: "Dominante diminuta da fundamental",
     });
     addUsage(usages, {
-      id: 'whole-tone',
-      modeName: 'Tons inteiros',
-      shapePrefix: 'X_whole_tone',
+      id: "whole-tone",
+      modeName: "Tons inteiros",
+      shapePrefix: "X_whole_tone",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: 'Tons inteiros da fundamental',
+      description: "Tons inteiros da fundamental",
     });
     addUsage(usages, {
-      id: 'dominant-blues',
-      modeName: 'Blues maior',
-      shapePrefix: 'X_blues_major',
+      id: "dominant-blues",
+      modeName: "Blues maior",
+      shapePrefix: "X_blues_major",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: 'Blues maior sobre dominante',
+      description: "Blues maior sobre dominante",
     });
   }
 
-  if (['Xm', 'Xm7', 'Xm9', 'Xm11'].some(has)) {
+  if (["Xm", "Xm7", "Xm9", "Xm11"].some(has)) {
     addUsage(usages, {
-      id: 'aeolian',
-      modeName: 'Eólio',
-      shapePrefix: 'X_aeolian_F4',
+      id: "aeolian",
+      modeName: "Eólio",
+      shapePrefix: "X_aeolian_F4",
       shapeRootOffset: 0,
       parentRootOffset: 3,
-      description: 'Menor natural da fundamental',
+      description: "Menor natural da fundamental",
     });
     addUsage(usages, {
-      id: 'dorian',
-      modeName: 'Dórico',
-      shapePrefix: 'X_dorian_F2',
+      id: "dorian",
+      modeName: "Dórico",
+      shapePrefix: "X_dorian_F2",
       shapeRootOffset: 0,
       parentRootOffset: 10,
-      description: '2º grau da escala maior',
+      description: "2º grau da escala maior",
     });
     addUsage(usages, {
-      id: 'phrygian',
-      modeName: 'Frígio',
-      shapePrefix: 'X_phrygian_F3',
+      id: "phrygian",
+      modeName: "Frígio",
+      shapePrefix: "X_phrygian_F3",
       shapeRootOffset: 0,
       parentRootOffset: 8,
-      description: '3º grau da escala maior',
+      description: "3º grau da escala maior",
     });
     addUsage(usages, {
-      id: 'minor-pentatonic',
-      modeName: 'Pentatônica menor',
-      shapePrefix: 'Xm_pentatonic_minor',
+      id: "minor-pentatonic",
+      modeName: "Pentatônica menor",
+      shapePrefix: "Xm_pentatonic_minor",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: 'Pentatônica menor da fundamental',
+      description: "Pentatônica menor da fundamental",
     });
     addUsage(usages, {
-      id: 'minor-blues',
-      modeName: 'Blues menor',
-      shapePrefix: 'Xm_blues_minor',
+      id: "minor-blues",
+      modeName: "Blues menor",
+      shapePrefix: "Xm_blues_minor",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: 'Blues menor da fundamental',
+      description: "Blues menor da fundamental",
     });
     addUsage(usages, {
-      id: 'melodic-minor',
-      modeName: 'Menor melódica',
-      shapePrefix: 'Xm_melodic_minor',
+      id: "melodic-minor",
+      modeName: "Menor melódica",
+      shapePrefix: "Xm_melodic_minor",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: 'Menor melódica da fundamental',
+      description: "Menor melódica da fundamental",
     });
   }
 
-  if (has('Xm6')) {
+  if (has("Xm6")) {
     addUsage(usages, {
-      id: 'melodic-minor',
-      modeName: 'Menor melódica',
-      shapePrefix: 'Xm_melodic_minor',
+      id: "melodic-minor",
+      modeName: "Menor melódica",
+      shapePrefix: "Xm_melodic_minor",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: 'Menor melódica da fundamental',
+      description: "Menor melódica da fundamental",
     });
     addUsage(usages, {
-      id: 'dorian',
-      modeName: 'Dórico',
-      shapePrefix: 'X_dorian_F2',
+      id: "dorian",
+      modeName: "Dórico",
+      shapePrefix: "X_dorian_F2",
       shapeRootOffset: 0,
       parentRootOffset: 10,
-      description: '2º grau da escala maior',
+      description: "2º grau da escala maior",
     });
   }
 
-  if (has('Xm7M')) {
+  if (has("Xm7M")) {
     addUsage(usages, {
-      id: 'harmonic-minor',
-      modeName: 'Menor harmônica',
-      shapePrefix: 'Xm_harmonic_minor',
+      id: "harmonic-minor",
+      modeName: "Menor harmônica",
+      shapePrefix: "Xm_harmonic_minor",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: 'Menor harmônica da fundamental',
+      description: "Menor harmônica da fundamental",
     });
     addUsage(usages, {
-      id: 'melodic-minor',
-      modeName: 'Menor melódica',
-      shapePrefix: 'Xm_melodic_minor',
+      id: "melodic-minor",
+      modeName: "Menor melódica",
+      shapePrefix: "Xm_melodic_minor",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: 'Menor melódica da fundamental',
+      description: "Menor melódica da fundamental",
     });
   }
 
-  if (has('Xm7(b5)')) {
+  if (has("Xm7(b5)")) {
     addUsage(usages, {
-      id: 'locrian',
-      modeName: 'Lócrio',
-      shapePrefix: 'X_locrian_F1_F4',
+      id: "locrian",
+      modeName: "Lócrio",
+      shapePrefix: "X_locrian_F1_F4",
       shapeRootOffset: 0,
       parentRootOffset: 1,
-      description: '7º grau da escala maior',
+      description: "7º grau da escala maior",
     });
     addUsage(usages, {
-      id: 'locrian-natural-2',
-      modeName: 'Lócrio 2 natural',
-      shapePrefix: 'Xm_melodic_minor',
+      id: "locrian-natural-2",
+      modeName: "Lócrio 2 natural",
+      shapePrefix: "Xm_melodic_minor",
       shapeRootOffset: 3,
       parentRootOffset: 3,
-      description: '6º grau da escala menor melódica',
+      description: "6º grau da escala menor melódica",
     });
     addUsage(usages, {
-      id: 'diminished',
-      modeName: 'Diminuta',
-      shapePrefix: 'X_diminished',
+      id: "diminished",
+      modeName: "Diminuta",
+      shapePrefix: "X_diminished",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: 'Diminuta da fundamental',
+      description: "Diminuta da fundamental",
     });
   }
 
-  if (has('Xdim') || has('X°')) {
+  if (has("Xdim") || has("X°")) {
     addUsage(usages, {
-      id: 'diminished',
-      modeName: 'Diminuta',
-      shapePrefix: 'X_diminished',
+      id: "diminished",
+      modeName: "Diminuta",
+      shapePrefix: "X_diminished",
       shapeRootOffset: 0,
       parentRootOffset: 0,
-      description: 'Diminuta da fundamental',
+      description: "Diminuta da fundamental",
     });
   }
 
@@ -475,11 +498,12 @@ function getModalUsages(genericSymbols: string[]): ScaleUsage[] {
 function getDirectJsonUsages(relatedScalePrefixes: string[]): ScaleUsage[] {
   return relatedScalePrefixes.map((prefix) => ({
     id: `json-${prefix}`,
-    modeName: prefix.replace(/^X/, '').replace(/^m_/, 'menor ').replace(/_/g, ' ').trim() || 'Escala',
+    modeName:
+      prefix.replace(/^X/, "").replace(/^m_/, "menor ").replace(/_/g, " ").trim() || "Escala",
     shapePrefix: prefix,
     shapeRootOffset: 0,
     parentRootOffset: getGreekModeParentRootOffset(prefix),
-    description: 'Relação direta declarada no JSON',
+    description: "Relação direta declarada no JSON",
   }));
 }
 
@@ -488,17 +512,20 @@ function isScaleRelatedToChord(
   genericSymbols: string[],
   relatedScalePrefixes: string[],
 ): boolean {
-  const hasPrefix = relatedScalePrefixes.some((prefix) => shape.name === prefix || shape.name.startsWith(`${prefix}_`));
-  const hasRelatedChord = shape.relatedChords?.some((symbol) => genericSymbols.includes(symbol)) ?? false;
+  const hasPrefix = relatedScalePrefixes.some(
+    (prefix) => shape.name === prefix || shape.name.startsWith(`${prefix}_`),
+  );
+  const hasRelatedChord =
+    shape.relatedChords?.some((symbol) => genericSymbols.includes(symbol)) ?? false;
   return hasPrefix || hasRelatedChord;
 }
 
 function appFretsFromJsonShape(shape: ScaleShapeEntry, delta: number): number[][] {
   return [
-    shape.scale['4'] ?? [],
-    shape.scale['3'] ?? [],
-    shape.scale['2'] ?? [],
-    shape.scale['1'] ?? [],
+    shape.scale["4"] ?? [],
+    shape.scale["3"] ?? [],
+    shape.scale["2"] ?? [],
+    shape.scale["1"] ?? [],
   ].map((stringFrets) => stringFrets.map((fret) => fret + delta).sort((a, b) => a - b));
 }
 
@@ -506,7 +533,11 @@ function chordFretsFromScale(scaleFrets: number[][]): number[] {
   return scaleFrets.map((stringFrets) => stringFrets[0] ?? -1);
 }
 
-function findRootFrets(scaleFrets: number[][], tuning: string[], targetRootIndex: number): number[][] {
+function findRootFrets(
+  scaleFrets: number[][],
+  tuning: string[],
+  targetRootIndex: number,
+): number[][] {
   return scaleFrets.map((stringFrets, stringIndex) => {
     const openIndex = getNoteIndex(tuning[stringIndex]);
     if (openIndex === -1) return [];
@@ -527,13 +558,19 @@ function buildScaleVoicing(
   scaleRootIndex: number,
   chordRootIndex: number,
   tuning: string[],
+  targetMinFret: number,
 ): Voicing | null {
   const referenceRootIndex = getReferenceRootIndex(shape);
   if (referenceRootIndex === -1) return null;
 
   const allFrets = Object.values(shape.scale).flat();
-  const minFret = allFrets.length > 0 ? Math.min(...allFrets) : 0;
-  const delta = getNearestTransposeDelta(referenceRootIndex, scaleRootIndex, minFret);
+  const scaleMinFret = allFrets.length > 0 ? Math.min(...allFrets) : 0;
+  const delta = getNearestTransposeDelta(
+    referenceRootIndex,
+    scaleRootIndex,
+    scaleMinFret,
+    targetMinFret,
+  );
   const scaleFrets = appFretsFromJsonShape(shape, delta);
   if (scaleFrets.some((stringFrets) => stringFrets.some((fret) => fret < 0))) return null;
 
@@ -570,21 +607,21 @@ function getPositionRootString(position: ScalePosition): number | null {
 }
 
 function formatDirection(shapeName: string): string {
-  if (shapeName.includes('_frente')) return 'frente';
-  if (shapeName.includes('_tras')) return 'tras';
-  return 'base';
+  if (shapeName.includes("_frente")) return "frente";
+  if (shapeName.includes("_tras")) return "tras";
+  return "base";
 }
 
 export function getScalePositions(chordName: string, tuning: string[]): ScalePosition[] {
-  const voicings = searchVoicings(chordName, { instrument: 'cavaquinho', tuning });
+  const voicings = searchVoicings(chordName, { instrument: "cavaquinho", tuning });
 
   return voicings
     .map((voicing, index) => {
       const lowest = getLowestPlayedNote(voicing, tuning);
       if (!lowest) return null;
       return {
-        id: `${voicing.startingFret}-${voicing.frets.join('-')}-${index}`,
-        label: `Fundamental ${voicing.rootString !== undefined ? `F${4 - voicing.rootString}` : 'detectada'}`,
+        id: `${voicing.startingFret}-${voicing.frets.join("-")}-${index}`,
+        label: `Fundamental ${voicing.rootString !== undefined ? `F${4 - voicing.rootString}` : "detectada"}`,
         voicing,
         lowestString: lowest.string,
         lowestFret: lowest.fret,
@@ -610,10 +647,7 @@ export function getScaleOptionsForPosition(
   const positionRootString = getPositionRootString(position);
   const modalUsages = getModalUsages(genericSymbols);
   const directUsages = getDirectJsonUsages(relatedScalePrefixes).filter(
-    (usage) =>
-      !modalUsages.some(
-        (modalUsage) => modalUsage.shapePrefix === usage.shapePrefix,
-      ),
+    (usage) => !modalUsages.some((modalUsage) => modalUsage.shapePrefix === usage.shapePrefix),
   );
   const usages = [...modalUsages, ...directUsages];
   const candidateResults = usages.flatMap((usage) => {
@@ -621,29 +655,56 @@ export function getScaleOptionsForPosition(
     const regionalMode = getRegionalGreekMode(usage, parentRootIndex, position);
     const matchingShapes = SCALE_CONFIG.scales.filter((shape) => {
       const prefixMatches =
-        shape.name === regionalMode.shapePrefix || shape.name.startsWith(`${regionalMode.shapePrefix}_`);
+        shape.name === regionalMode.shapePrefix ||
+        shape.name.startsWith(`${regionalMode.shapePrefix}_`);
       const directRelationMatches =
-        usage.id.startsWith('json-') &&
+        usage.id.startsWith("json-") &&
         !isGreekModeUsage(usage) &&
         isScaleRelatedToChord(shape, genericSymbols, [usage.shapePrefix]);
-      return prefixMatches || directRelationMatches;
+
+      if (!(prefixMatches || directRelationMatches)) return false;
+
+      if (!isGreekModeUsage(usage) && positionRootString !== null) {
+        // App strings are 0-indexed: 0=D4, 1=B3, 2=G3, 3=D5
+        // JSON strings are 1-indexed: 1=D5, 2=B3, 3=G3, 4=D4
+        // Mapping: App string 0 -> JSON string 4
+        // Mapping: App string 1 -> JSON string 3
+        // Mapping: App string 2 -> JSON string 2
+        // Mapping: App string 3 -> JSON string 1
+        const expectedJsonString = 4 - positionRootString;
+        if (shape.fundamental.string !== expectedJsonString) {
+          return false;
+        }
+      }
+      return true;
     });
 
     const usageResults = matchingShapes
       .map((shape) => {
         const shapeRootIndex = regionalMode.shapeRootIndex;
-        const voicing = buildScaleVoicing(shape, shapeRootIndex, chordRootIndex, tuning);
+        const targetMinFret = position.lowestFret;
+        const voicing = buildScaleVoicing(
+          shape,
+          shapeRootIndex,
+          chordRootIndex,
+          tuning,
+          targetMinFret,
+        );
         if (!voicing) return null;
 
-        const formLabel = [regionalMode.regionLabel, shape.fundamental.code, formatDirection(shape.name)]
+        const formLabel = [
+          regionalMode.regionLabel,
+          shape.fundamental.code,
+          formatDirection(shape.name),
+        ]
           .filter(Boolean)
-          .join(' · ');
+          .join(" · ");
         const descriptionParts = [
           usage.description,
           `Escala-mae: ${noteName(parentRootIndex)}`,
           regionalMode.regionLabel ? `Regiao escolhida: ${regionalMode.regionLabel}` : null,
           shape.usageNotes,
-          shape.relatedChords?.length ? `Acordes: ${shape.relatedChords.join(', ')}` : null,
+          shape.relatedChords?.length ? `Acordes: ${shape.relatedChords.join(", ")}` : null,
         ].filter(Boolean);
 
         return {
@@ -651,7 +712,7 @@ export function getScaleOptionsForPosition(
           name: `${parsed.root} ${usage.modeName}`,
           parentScaleName: `${noteName(parentRootIndex)} ${shape.sourceGroup ?? shape.scaleType} (${shape.name})`,
           formLabel,
-          description: descriptionParts.join(' | '),
+          description: descriptionParts.join(" | "),
           noteNames: shape.formula,
           voicing,
         };
