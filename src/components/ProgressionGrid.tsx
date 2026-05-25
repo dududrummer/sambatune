@@ -208,7 +208,7 @@ export function ProgressionGrid({
                   return (
                     <div key={bi}
                       className={`flex-1 min-w-0 rounded border px-1.5 py-1 flex flex-col items-center ${FUNC_COLORS[color]}`}
-                      style={{ minWidth: showImprovisationOptions ? '78px' : '44px' }}
+                      style={{ minWidth: showImprovisationOptions ? '142px' : '44px' }}
                     >
                       {/* Roman numeral */}
                       {a && (
@@ -220,63 +220,72 @@ export function ProgressionGrid({
                       <div className="text-xs font-bold truncate w-full leading-tight text-center">
                         {beat.chordName}
                       </div>
-                      {/* Mini voicing diagram — clickable */}
-                      {voicing && getVoicingsForChord && onVoicingSelect ? (
-                        <VoicingPicker
-                          chordName={beat.chordName}
-                          current={voicing}
-                          allVoicings={allVoicings}
-                          stringCount={voicing.tuning?.length ?? stringCount}
-                          markerColor={markerColor}
-                          primaryColor={primaryColor}
-                          onSelect={(v) => onVoicingSelect(beat.chordName, v)}
-                        />
-                      ) : voicing ? (
-                        <div className="mt-1.5 rounded overflow-hidden bg-white/60 dark:bg-black/30">
-                          <VoicingMiniSvg
-                            voicing={voicing}
-                            stringCount={voicing.tuning?.length ?? stringCount}
-                            markerColor={markerColor}
-                            primaryColor={primaryColor}
-                            renderMode={showImprovisationOptions ? 'chord' : 'combined'}
-                            width={58}
-                            height={104}
-                          />
-                          <div className="text-[7px] text-center opacity-50 pb-0.5">
-                            {voicing.frets.map(f => f === -1 ? 'X' : f).join(' ')}
-                          </div>
+
+                      {/* Diagrams Container (Chord & Arpeggio side-by-side when improvisation is active) */}
+                      <div className="flex gap-2 justify-center items-start w-full">
+                        {/* Chord section */}
+                        <div className="flex flex-col items-center">
+                          {voicing && getVoicingsForChord && onVoicingSelect ? (
+                            <VoicingPicker
+                              chordName={beat.chordName}
+                              current={voicing}
+                              allVoicings={allVoicings}
+                              stringCount={voicing.tuning?.length ?? stringCount}
+                              markerColor={markerColor}
+                              primaryColor={primaryColor}
+                              onSelect={(v) => onVoicingSelect(beat.chordName, v)}
+                            />
+                          ) : voicing ? (
+                            <div className="mt-1.5 rounded overflow-hidden bg-white/60 dark:bg-black/30">
+                              <VoicingMiniSvg
+                                voicing={voicing}
+                                stringCount={voicing.tuning?.length ?? stringCount}
+                                markerColor={markerColor}
+                                primaryColor={primaryColor}
+                                renderMode={showImprovisationOptions ? 'chord' : 'combined'}
+                                width={58}
+                                height={104}
+                              />
+                              <div className="text-[7px] text-center opacity-50 pb-0.5">
+                                {voicing.frets.map(f => f === -1 ? 'X' : f).join(' ')}
+                              </div>
+                            </div>
+                          ) : (
+                            hasVoicings && (
+                              <div className="mt-1.5 text-[8px] opacity-40 text-center">
+                                sem diagrama
+                              </div>
+                            )
+                          )}
                         </div>
-                      ) : (
-                        hasVoicings && (
-                          <div className="mt-1.5 text-[8px] opacity-40 text-center">
-                            sem diagrama
+
+                        {/* Arpeggio section (side-by-side) */}
+                        {showImprovisationOptions && voicing?.arpeggioFrets && (
+                          <div className="mt-1.5 rounded-md overflow-hidden bg-orange-50/90 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800 flex flex-col items-center">
+                            <div className="text-[8px] uppercase tracking-wide text-center font-black text-orange-700 dark:text-orange-300 pt-0.5 leading-none px-1">
+                              Arpejo
+                            </div>
+                            <VoicingMiniSvg
+                              voicing={voicing}
+                              stringCount={voicing.tuning?.length ?? stringCount}
+                              markerColor={markerColor}
+                              primaryColor={primaryColor}
+                              arpeggioColor="#f97316"
+                              renderMode="arpeggio"
+                              width={58}
+                              height={104}
+                            />
                           </div>
-                        )
-                      )}
-                      {showImprovisationOptions && voicing?.arpeggioFrets && (
-                        <div className="mt-2 rounded-md overflow-hidden bg-orange-50/90 dark:bg-orange-950/30 border border-orange-200 dark:border-orange-800">
-                          <div className="text-[8px] uppercase tracking-wide text-center font-black text-orange-700 dark:text-orange-300 pt-1">
-                            Arpejo
-                          </div>
-                          <VoicingMiniSvg
-                            voicing={voicing}
-                            stringCount={voicing.tuning?.length ?? stringCount}
-                            markerColor={markerColor}
-                            primaryColor={primaryColor}
-                            arpeggioColor="#f97316"
-                            renderMode="arpeggio"
-                            width={58}
-                            height={104}
-                          />
-                        </div>
-                      )}
-                      {/* Scale options for improvisation */}
+                        )}
+                      </div>
+
+                      {/* Scale options for improvisation (placed below) */}
                       {showImprovisationOptions && scaleOptionsMap[beat.chordName]?.length > 0 && (
-                        <div className="mt-2 space-y-1 w-full">
+                        <div className="mt-2.5 space-y-1 w-full border-t border-dashed border-border/50 pt-2">
                           <div className="text-[8px] uppercase tracking-wide text-center font-black text-emerald-700 dark:text-emerald-300">
                             Escalas
                           </div>
-                          <div className="flex flex-wrap gap-1 justify-center">
+                          <div className="flex flex-wrap gap-1.5 justify-center">
                             {scaleOptionsMap[beat.chordName].map((scale) => (
                               <Popover key={scale.id}>
                                 <PopoverTrigger asChild>
@@ -291,9 +300,12 @@ export function ProgressionGrid({
                                       primaryColor={primaryColor}
                                       arpeggioColor="#10b981"
                                       renderMode="arpeggio"
-                                      width={44}
-                                      height={76}
+                                      width={58}
+                                      height={104}
                                     />
+                                    <div className="text-[6.5px] text-center opacity-70 pb-0.5 bg-emerald-100/50 dark:bg-emerald-900/50 truncate max-w-[58px] px-0.5 leading-tight">
+                                      {scale.name.includes("shape") ? scale.name.split("shape")[1].replace(")", "").trim() : scale.name}
+                                    </div>
                                   </button>
                                 </PopoverTrigger>
                                 <PopoverContent
