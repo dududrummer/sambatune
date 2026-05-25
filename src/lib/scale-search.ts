@@ -699,11 +699,10 @@ export function getScaleOptionsForPosition(
 
       const usageResults = matchingShapes
         .map((shape) => {
-          const shapeRootIndex = regionalMode.shapeRootIndex;
           const targetMinFret = position.lowestFret;
           const voicing = buildScaleVoicing(
             shape,
-            shapeRootIndex,
+            parentRootIndex,
             chordRootIndex,
             tuning,
             targetMinFret,
@@ -720,12 +719,16 @@ export function getScaleOptionsForPosition(
 
           let modeName = usage.modeName;
           if (isGreekModeUsage(usage) && regionalMode.regionLabel) {
-            // We replaced the default usage modeName with the actual surrounding mode
             const modeMatch = GREEK_MODE_BY_DEGREE.find(
               (m) => m.prefix === regionalMode.shapePrefix,
             );
             if (modeMatch) modeName = modeMatch.modeName;
           }
+
+          const optionName =
+            isGreekModeUsage(usage) && regionalMode.regionLabel
+              ? regionalMode.regionLabel
+              : `${parsed.root} ${modeName}`;
 
           const descriptionParts = [
             usage.description,
@@ -737,7 +740,7 @@ export function getScaleOptionsForPosition(
 
           return {
             id: `${usage.id}-${shape.name}-${position.id}`,
-            name: `${parsed.root} ${modeName}`,
+            name: optionName,
             parentScaleName: `${noteName(parentRootIndex)} ${shape.sourceGroup ?? shape.scaleType} (${shape.name})`,
             formLabel,
             description: descriptionParts.join(" | "),
