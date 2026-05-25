@@ -641,6 +641,19 @@ export function getScalePositions(chordName: string, tuning: string[]): ScalePos
     .filter((position): position is ScalePosition => position !== null);
 }
 
+export function voicingToScalePosition(voicing: Voicing, tuning: string[]): ScalePosition | null {
+  const lowest = getLowestPlayedNote(voicing, tuning);
+  if (!lowest) return null;
+  return {
+    id: `${voicing.startingFret}-${voicing.frets.join("-")}-0`,
+    label: `Fundamental ${voicing.rootString !== undefined ? `F${4 - voicing.rootString}` : "detectada"}`,
+    voicing,
+    lowestString: lowest.string,
+    lowestFret: lowest.fret,
+    lowestNote: noteName(lowest.noteIndex),
+  };
+}
+
 export function getScaleOptionsForPosition(
   chordName: string,
   tuning: string[],

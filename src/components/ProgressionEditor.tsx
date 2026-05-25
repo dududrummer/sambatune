@@ -371,6 +371,7 @@ export function ProgressionEditor({
           getVoicingsForChord={getVoicingsForChord}
           onVoicingSelect={handleVoicingSelect}
           showImprovisationOptions={isImprovisation}
+          tuning={getActiveTuning()}
         />
 
         {measures.length > 0 && (

@@ -1,7 +1,12 @@
-import { useState } from 'react';
+import { useMemo, useState } from 'react';
 import type { Measure } from '@/lib/progression';
 import type { HarmonicAnalysis } from '@/lib/harmony';
 import type { Voicing } from '@/lib/chord-finder';
+import {
+  getScaleOptionsForPosition,
+  voicingToScalePosition,
+  type ScaleOptionResult,
+} from '@/lib/scale-search';
 import { VoicingMiniSvg } from './VoicingMiniSvg';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
 
@@ -34,6 +39,7 @@ interface Props {
   /** Called when user selects a new voicing in the picker */
   onVoicingSelect?: (chordName: string, voicing: Voicing) => void;
   showImprovisationOptions?: boolean;
+  tuning?: string[];
 }
 
 // ── Voicing Picker Popover ──────────────────────────────────────────────────
@@ -125,8 +131,24 @@ export function ProgressionGrid({
   markerColor = '#000', primaryColor = '#000',
   getVoicingsForChord, onVoicingSelect,
   showImprovisationOptions = false,
+  tuning = ['D', 'G', 'B', 'D'],
 }: Props) {
   const hasVoicings = Object.keys(voicings).length > 0;
+
+  // Compute scale options for each chord when in improvisation mode
+  const scaleOptionsMap = useMemo(() => {
+    if (!showImprovisationOptions) return {} as Record<string, ScaleOptionResult[]>;
+    const map: Record<string, ScaleOptionResult[]> = {};
+    const chordNames = new Set(measures.flatMap(m => m.beats.map(b => b.chordName)));
+    for (const chordName of chordNames) {
+      const voicing = voicings[chordName];
+      if (!voicing) continue;
+      const position = voicingToScalePosition(voicing, tuning);
+      if (!position) continue;
+      map[chordName] = getScaleOptionsForPosition(chordName, tuning, position);
+    }
+    return map;
+  }, [showImprovisationOptions, measures, voicings, tuning]);
 
   if (measures.length === 0) {
     return (
@@ -246,6 +268,69 @@ export function ProgressionGrid({
                             width={58}
                             height={104}
                           />
+                        </div>
+                      )}
+                      {/* Scale options for improvisation */}
+                      {showImprovisationOptions && scaleOptionsMap[beat.chordName]?.length > 0 && (
+                        <div className="mt-2 space-y-1 w-full">
+                          <div className="text-[8px] uppercase tracking-wide text-center font-black text-emerald-700 dark:text-emerald-300">
+                            Escalas
+                          </div>
+                          <div className="flex flex-wrap gap-1 justify-center">
+                            {scaleOptionsMap[beat.chordName].map((scale) => (
+                              <Popover key={scale.id}>
+                                <PopoverTrigger asChild>
+                                  <button
+                                    className="rounded-md overflow-hidden bg-emerald-50/90 dark:bg-emerald-950/30 border border-emerald-200 dark:border-emerald-800 cursor-pointer hover:scale-105 transition-all hover:ring-1 hover:ring-emerald-400"
+                                    title={`${scale.name} — ${scale.formLabel}`}
+                                  >
+                                    <VoicingMiniSvg
+                                      voicing={scale.voicing}
+                                      stringCount={voicing.tuning?.length ?? stringCount}
+                                      markerColor={markerColor}
+                                      primaryColor={primaryColor}
+                                      arpeggioColor="#10b981"
+                                      renderMode="arpeggio"
+                                      width={44}
+                                      height={76}
+                                    />
+                                  </button>
+                                </PopoverTrigger>
+                                <PopoverContent
+                                  className="w-auto max-w-[300px] p-3"
+                                  align="center"
+                                  side="bottom"
+                                >
+                                  <div className="space-y-2">
+                                    <div className="text-sm font-bold text-emerald-700 dark:text-emerald-300">
+                                      {scale.name}
+                                    </div>
+                                    <p className="text-[10px] text-muted-foreground">
+                                      {scale.description} {scale.parentScaleName}
+                                    </p>
+                                    <p className="text-[10px] text-muted-foreground font-mono">
+                                      {scale.noteNames.join(' - ')}
+                                    </p>
+                                    <span className="inline-block rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
+                                      {scale.formLabel}
+                                    </span>
+                                    <div className="inline-flex rounded-lg border-2 border-border bg-white dark:bg-zinc-900">
+                                      <VoicingMiniSvg
+                                        voicing={scale.voicing}
+                                        stringCount={voicing.tuning?.length ?? stringCount}
+                                        markerColor={markerColor}
+                                        primaryColor={primaryColor}
+                                        arpeggioColor="#10b981"
+                                        renderMode="arpeggio"
+                                        width={108}
+                                        height={146}
+                                      />
+                                    </div>
+                                  </div>
+                                </PopoverContent>
+                              </Popover>
+                            ))}
+                          </div>
                         </div>
                       )}
                       {/* Function label */}
