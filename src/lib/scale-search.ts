@@ -661,6 +661,7 @@ export function getScaleOptionsForPosition(
   );
   const usages = [...modalUsages, ...directUsages];
   const candidateResults = usages.flatMap((usage) => {
+    const isPentatonicOrBlues = usage.id.includes("pentatonic") || usage.id.includes("blues");
     const parentRootIndex = normalizeInterval(chordRootIndex + usage.parentRootOffset);
     const regionalModes = getRegionalGreekModes(usage, parentRootIndex, position);
 
@@ -682,7 +683,7 @@ export function getScaleOptionsForPosition(
           if (hasMoreThanTwo) return false;
         }
 
-        if (!isGreekModeUsage(usage) && positionRootString !== null) {
+        if (!isGreekModeUsage(usage) && !isPentatonicOrBlues && positionRootString !== null) {
           // App strings are 0-indexed: 0=D4, 1=B3, 2=G3, 3=D5
           // JSON strings are 1-indexed: 1=D5, 2=B3, 3=G3, 4=D4
           // Mapping: App string 0 -> JSON string 4
@@ -718,17 +719,18 @@ export function getScaleOptionsForPosition(
             .join(" · ");
 
           let modeName = usage.modeName;
+          let optionName = `${parsed.root} ${modeName}`;
           if (isGreekModeUsage(usage) && regionalMode.regionLabel) {
             const modeMatch = GREEK_MODE_BY_DEGREE.find(
               (m) => m.prefix === regionalMode.shapePrefix,
             );
-            if (modeMatch) modeName = modeMatch.modeName;
+            const shapeModeName = modeMatch ? modeMatch.modeName.toLowerCase() : "";
+            let scaleModeAlias = usage.modeName.toLowerCase();
+            if (usage.id === "ionian") {
+              scaleModeAlias = "diatônico";
+            }
+            optionName = `${parsed.root} ${scaleModeAlias} (shape ${shapeModeName})`;
           }
-
-          const optionName =
-            isGreekModeUsage(usage) && regionalMode.regionLabel
-              ? regionalMode.regionLabel
-              : `${parsed.root} ${modeName}`;
 
           const descriptionParts = [
             usage.description,
@@ -751,7 +753,7 @@ export function getScaleOptionsForPosition(
         .filter((result): result is ScaleOptionResult => result !== null);
 
       const usageResultsForPosition =
-        positionRootString === null
+        positionRootString === null || isPentatonicOrBlues
           ? usageResults
           : usageResults.filter((result) => result.voicing.rootFrets?.[positionRootString]?.length);
 
@@ -761,6 +763,9 @@ export function getScaleOptionsForPosition(
 
   const seen = new Set<string>();
   const uniqueResults = candidateResults.filter((result) => {
+    const fretDistance = Math.abs(result.voicing.startingFret - position.lowestFret);
+    if (fretDistance > 2) return false;
+
     const key = `${result.name}-${result.parentScaleName}-${result.formLabel}`;
     if (seen.has(key)) return false;
     seen.add(key);
