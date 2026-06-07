@@ -61,6 +61,7 @@ interface ProgressionDraft {
   input?: string;
   bpm?: number;
   voicings?: Record<string, StoredVoicing>;
+  chordScales?: Record<string, string[]>;
 }
 
 function loadProgressionDraft(key: string): ProgressionDraft {
@@ -93,6 +94,7 @@ export function ProgressionEditor({
   const [selectedKey, setSelectedKey] = useState(draft.selectedKey ?? "");
   const [input, setInput] = useState(draft.input ?? "");
   const [voicings, setVoicings] = useState<Record<string, StoredVoicing>>(draft.voicings ?? {});
+  const [chordScales, setChordScales] = useState<Record<string, string[]>>(draft.chordScales ?? {});
 
   const [isPlaying, setIsPlaying] = useState(false);
   const [activeMeasure, setActiveMeasure] = useState<number | null>(null);
@@ -124,12 +126,13 @@ export function ProgressionEditor({
           input,
           bpm,
           voicings,
+          chordScales,
         }),
       );
     } catch {
       // Ignore storage failures; the editor still works without draft persistence.
     }
-  }, [selectedCategory, selectedTemplate, selectedKey, input, bpm, voicings, draftKey]);
+  }, [selectedCategory, selectedTemplate, selectedKey, input, bpm, voicings, chordScales, draftKey]);
 
   // Stop playback on unmount
   useEffect(() => {
@@ -372,6 +375,11 @@ export function ProgressionEditor({
           onVoicingSelect={handleVoicingSelect}
           showImprovisationOptions={isImprovisation}
           tuning={getActiveTuning()}
+          chordScales={chordScales}
+          onChordScalesChange={(key, scales) =>
+            setChordScales(prev => ({ ...prev, [key]: scales }))
+          }
+          instrument={instrument}
         />
 
         {measures.length > 0 && (
