@@ -174,7 +174,7 @@ function ScaleRegionsDisplay({
     if (!selectedScales.includes(activeScale) && selectedScales.length > 0) {
       setActiveScale(selectedScales[0]);
     }
-  }, [selectedScales, activeScale]);
+  }, [selectedScales]);
 
   const [before, at, after] = useMemo(
     () => getThreeRegions(chordName, tuning, currentStartingFret),
