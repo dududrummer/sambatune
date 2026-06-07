@@ -9,6 +9,7 @@ import {
 } from '@/lib/scale-search';
 import { VoicingMiniSvg } from './VoicingMiniSvg';
 import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+import { ImprovisationCard } from './ImprovisationCard';
 
 interface StoredVoicing extends Voicing { tuning: string[] }
 
@@ -40,6 +41,9 @@ interface Props {
   onVoicingSelect?: (chordName: string, voicing: Voicing) => void;
   showImprovisationOptions?: boolean;
   tuning?: string[];
+  chordScales?: Record<string, string[]>;
+  onChordScalesChange?: (key: string, scales: string[]) => void;
+  instrument?: string;
 }
 
 // ── Voicing Picker Popover ──────────────────────────────────────────────────
@@ -132,6 +136,9 @@ export function ProgressionGrid({
   getVoicingsForChord, onVoicingSelect,
   showImprovisationOptions = false,
   tuning = ['D', 'G', 'B', 'D'],
+  chordScales = {},
+  onChordScalesChange,
+  instrument = 'cavaquinho',
 }: Props) {
   const hasVoicings = Object.keys(voicings).length > 0;
 
@@ -205,7 +212,22 @@ export function ProgressionGrid({
                     ? getVoicingsForChord(beat.chordName)
                     : [];
 
-                  return (
+                  return showImprovisationOptions && voicing ? (
+                    <ImprovisationCard
+                      key={bi}
+                      chordBeat={beat}
+                      voicing={voicing}
+                      instrument={instrument}
+                      tuning={tuning}
+                      selectedScales={chordScales[`${measure.index}_${bi}`] ?? []}
+                      onScalesChange={scales => onChordScalesChange?.(`${measure.index}_${bi}`, scales)}
+                      stringCount={voicing.tuning?.length ?? stringCount}
+                      markerColor={markerColor}
+                      primaryColor={primaryColor}
+                      measureIndex={measure.index}
+                      beatIndex={bi}
+                    />
+                  ) : (
                     <div key={bi}
                       className={`flex-1 min-w-0 rounded border px-1.5 py-1 flex flex-col items-center ${FUNC_COLORS[color]}`}
                       style={{ minWidth: showImprovisationOptions ? '142px' : '44px' }}
