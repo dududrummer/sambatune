@@ -46,6 +46,15 @@ export function ProgressionAudio({ measures, voicings, onMeasureChange, mode = '
 
   useEffect(() => () => { stopPlayback(); }, []);
 
+  useEffect(() => {
+    if (mode === 'improvisation' && style !== 'batucada' && style !== 'sambaenredo') {
+      const defaultStyle: Style = 'batucada';
+      setStyle(defaultStyle);
+      const firstBpm = availableBpms(defaultStyle as LoopStyle)[0] ?? DEFAULT_BPM[defaultStyle];
+      setBpmState(firstBpm);
+    }
+  }, [mode, style]);
+
   const handleStyleChange = useCallback((s: Style) => {
     setStyle(s);
     const newBpm = mode === 'improvisation'
