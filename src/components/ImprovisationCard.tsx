@@ -1,17 +1,19 @@
-import { useState, useEffect, useMemo } from 'react';
-import { ChevronLeft, ChevronRight, Plus, X } from 'lucide-react';
-import type { ChordBeat } from '@/lib/progression';
-import type { Voicing } from '@/lib/chord-finder';
-import { searchVoicings } from '@/lib/arpeggio-search';
-import { VoicingMiniSvg } from './VoicingMiniSvg';
+import { useState, useEffect, useMemo } from "react";
+import { ChevronLeft, ChevronRight, Plus, X } from "lucide-react";
+import type { ChordBeat } from "@/lib/progression";
+import type { Voicing } from "@/lib/chord-finder";
+import { searchVoicings } from "@/lib/arpeggio-search";
+import { VoicingMiniSvg } from "./VoicingMiniSvg";
 import {
   getScalePositions,
   getScaleOptionsForPosition,
   type ScalePosition,
-} from '@/lib/scale-search';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
+} from "@/lib/scale-search";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 
-interface StoredVoicing extends Voicing { tuning: string[] }
+interface StoredVoicing extends Voicing {
+  tuning: string[];
+}
 
 export interface ImprovisationCardProps {
   chordBeat: ChordBeat;
@@ -28,9 +30,12 @@ export interface ImprovisationCardProps {
 }
 
 const SCALE_CATEGORIES = [
-  { label: 'Modos Gregos', modes: ['Jônio', 'Dórico', 'Frígio', 'Lídio', 'Mixolídio', 'Eólio', 'Lócrio'] },
-  { label: 'Pentatônicas', modes: ['Pentatônica Maior', 'Pentatônica Menor'] },
-  { label: 'Blues', modes: ['Blues Maior', 'Blues Menor'] },
+  {
+    label: "Modos Gregos",
+    modes: ["Jônio", "Dórico", "Frígio", "Lídio", "Mixolídio", "Eólio", "Lócrio"],
+  },
+  { label: "Pentatônicas", modes: ["Pentatônica Maior", "Pentatônica Menor"] },
+  { label: "Blues", modes: ["Blues Maior", "Blues Menor"] },
 ] as const;
 
 function getThreeRegions(
@@ -45,7 +50,10 @@ function getThreeRegions(
   let minDiff = Infinity;
   sorted.forEach((pos, i) => {
     const d = Math.abs(pos.lowestFret - currentStartingFret);
-    if (d < minDiff) { minDiff = d; atIdx = i; }
+    if (d < minDiff) {
+      minDiff = d;
+      atIdx = i;
+    }
   });
   return [
     atIdx > 0 ? sorted[atIdx - 1] : null,
@@ -55,8 +63,15 @@ function getThreeRegions(
 }
 
 function ScaleRegionDiagram({
-  label, position, chordName, tuning, scaleName,
-  strCount, markerColor, primaryColor, isHighlighted,
+  label,
+  position,
+  chordName,
+  tuning,
+  scaleName,
+  strCount,
+  markerColor,
+  primaryColor,
+  isHighlighted,
 }: {
   label: string;
   position: ScalePosition | null;
@@ -72,16 +87,18 @@ function ScaleRegionDiagram({
     if (!position) return null;
     const options = getScaleOptionsForPosition(chordName, tuning, position);
     return (
-      options.find(o => o.name.toLowerCase().includes(scaleName.toLowerCase())) ??
-      options.find(o => o.description?.toLowerCase().includes(scaleName.toLowerCase())) ??
+      options.find((o) => o.name.toLowerCase().includes(scaleName.toLowerCase())) ??
+      options.find((o) => o.description?.toLowerCase().includes(scaleName.toLowerCase())) ??
       null
     );
   }, [position, chordName, tuning, scaleName]);
 
   return (
-    <div className={`flex flex-1 flex-col items-center rounded p-1 transition-opacity ${
-      isHighlighted ? 'border border-primary/40 bg-primary/5' : 'opacity-50'
-    }`}>
+    <div
+      className={`flex flex-1 flex-col items-center rounded p-1 transition-opacity ${
+        isHighlighted ? "border border-primary/40 bg-primary/5" : "opacity-50"
+      }`}
+    >
       <span className="text-[8px] text-muted-foreground mb-0.5 truncate w-full text-center">
         {label}
       </span>
@@ -126,21 +143,26 @@ function ScaleDropdown({
       </PopoverTrigger>
       <PopoverContent className="w-48 p-2" align="start" side="bottom">
         <div className="space-y-2 max-h-64 overflow-y-auto">
-          {SCALE_CATEGORIES.map(cat => (
+          {SCALE_CATEGORIES.map((cat) => (
             <div key={cat.label}>
               <div className="mb-1 text-[9px] font-bold uppercase tracking-wide text-muted-foreground">
                 {cat.label}
               </div>
               <div className="space-y-0.5 pl-1">
-                {cat.modes.map(mode => {
+                {cat.modes.map((mode) => {
                   const isActive = selectedScales.includes(mode);
                   return (
                     <button
                       key={mode}
                       disabled={isActive}
-                      onClick={() => { onAdd(mode); setOpen(false); }}
+                      onClick={() => {
+                        onAdd(mode);
+                        setOpen(false);
+                      }}
                       className={`w-full rounded px-2 py-0.5 text-left text-[10px] transition-colors ${
-                        isActive ? 'cursor-default text-muted-foreground' : 'cursor-pointer hover:bg-primary/10 hover:text-primary'
+                        isActive
+                          ? "cursor-default text-muted-foreground"
+                          : "cursor-pointer hover:bg-primary/10 hover:text-primary"
                       }`}
                     >
                       {isActive ? `✓ ${mode}` : mode}
@@ -157,8 +179,13 @@ function ScaleDropdown({
 }
 
 function ScaleRegionsDisplay({
-  selectedScales, chordName, tuning,
-  currentStartingFret, strCount, markerColor, primaryColor,
+  selectedScales,
+  chordName,
+  tuning,
+  currentStartingFret,
+  strCount,
+  markerColor,
+  primaryColor,
 }: {
   selectedScales: string[];
   chordName: string;
@@ -168,12 +195,13 @@ function ScaleRegionsDisplay({
   markerColor: string;
   primaryColor: string;
 }) {
-  const [activeScale, setActiveScale] = useState(selectedScales[0] ?? '');
+  const [activeScale, setActiveScale] = useState(selectedScales[0] ?? "");
 
   useEffect(() => {
     if (!selectedScales.includes(activeScale) && selectedScales.length > 0) {
       setActiveScale(selectedScales[0]);
     }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedScales]);
 
   const [before, at, after] = useMemo(
@@ -185,14 +213,14 @@ function ScaleRegionsDisplay({
     <div className="space-y-1.5">
       {selectedScales.length > 1 && (
         <div className="flex flex-wrap gap-1">
-          {selectedScales.map(scale => (
+          {selectedScales.map((scale) => (
             <button
               key={scale}
               onClick={() => setActiveScale(scale)}
               className={`rounded px-2 py-0.5 text-[9px] transition-colors ${
                 scale === activeScale
-                  ? 'bg-primary text-primary-foreground'
-                  : 'bg-muted text-muted-foreground hover:bg-muted/80'
+                  ? "bg-primary text-primary-foreground"
+                  : "bg-muted text-muted-foreground hover:bg-muted/80"
               }`}
             >
               {scale}
@@ -201,18 +229,54 @@ function ScaleRegionsDisplay({
         </div>
       )}
       <div className="flex gap-1">
-        <ScaleRegionDiagram label="◀ antes" position={before} chordName={chordName} tuning={tuning} scaleName={activeScale} strCount={strCount} markerColor={markerColor} primaryColor={primaryColor} isHighlighted={false} />
-        <ScaleRegionDiagram label="● região" position={at} chordName={chordName} tuning={tuning} scaleName={activeScale} strCount={strCount} markerColor={markerColor} primaryColor={primaryColor} isHighlighted={true} />
-        <ScaleRegionDiagram label="depois ▶" position={after} chordName={chordName} tuning={tuning} scaleName={activeScale} strCount={strCount} markerColor={markerColor} primaryColor={primaryColor} isHighlighted={false} />
+        <ScaleRegionDiagram
+          label="◀ antes"
+          position={before}
+          chordName={chordName}
+          tuning={tuning}
+          scaleName={activeScale}
+          strCount={strCount}
+          markerColor={markerColor}
+          primaryColor={primaryColor}
+          isHighlighted={false}
+        />
+        <ScaleRegionDiagram
+          label="● região"
+          position={at}
+          chordName={chordName}
+          tuning={tuning}
+          scaleName={activeScale}
+          strCount={strCount}
+          markerColor={markerColor}
+          primaryColor={primaryColor}
+          isHighlighted={true}
+        />
+        <ScaleRegionDiagram
+          label="depois ▶"
+          position={after}
+          chordName={chordName}
+          tuning={tuning}
+          scaleName={activeScale}
+          strCount={strCount}
+          markerColor={markerColor}
+          primaryColor={primaryColor}
+          isHighlighted={false}
+        />
       </div>
     </div>
   );
 }
 
 export function ImprovisationCard({
-  chordBeat, voicing, instrument, tuning,
-  selectedScales, onScalesChange,
-  stringCount, markerColor, primaryColor,
+  chordBeat,
+  voicing,
+  instrument,
+  tuning,
+  selectedScales,
+  onScalesChange,
+  stringCount,
+  markerColor,
+  primaryColor,
 }: ImprovisationCardProps) {
   // ── Arpejo navigation ──────────────────────────────────────────────────
   const allVoicings = useMemo(
@@ -228,7 +292,10 @@ export function ImprovisationCard({
     let minDiff = Infinity;
     allVoicings.forEach((v, i) => {
       const diff = Math.abs(v.startingFret - voicing.startingFret);
-      if (diff < minDiff) { minDiff = diff; bestIdx = i; }
+      if (diff < minDiff) {
+        minDiff = diff;
+        bestIdx = i;
+      }
     });
     setArpeggioIndex(bestIdx);
   }, [allVoicings, voicing.startingFret]);
@@ -262,7 +329,7 @@ export function ImprovisationCard({
             <div className="flex items-center w-full justify-between">
               <button
                 onClick={() =>
-                  setArpeggioIndex(i => (i - 1 + allVoicings.length) % allVoicings.length)
+                  setArpeggioIndex((i) => (i - 1 + allVoicings.length) % allVoicings.length)
                 }
                 disabled={allVoicings.length <= 1}
                 className="text-emerald-500 hover:text-emerald-400 disabled:opacity-30"
@@ -274,7 +341,7 @@ export function ImprovisationCard({
                 ARPEJO
               </span>
               <button
-                onClick={() => setArpeggioIndex(i => (i + 1) % allVoicings.length)}
+                onClick={() => setArpeggioIndex((i) => (i + 1) % allVoicings.length)}
                 disabled={allVoicings.length <= 1}
                 className="text-emerald-500 hover:text-emerald-400 disabled:opacity-30"
                 aria-label="Próximo arpejo"
@@ -297,7 +364,7 @@ export function ImprovisationCard({
                 <div
                   key={i}
                   className={`h-1.5 w-1.5 rounded-full transition-colors ${
-                    i === arpeggioIndex ? 'bg-emerald-500' : 'bg-muted-foreground/30'
+                    i === arpeggioIndex ? "bg-emerald-500" : "bg-muted-foreground/30"
                   }`}
                 />
               ))}
@@ -313,14 +380,14 @@ export function ImprovisationCard({
       {/* Row 2: Scale selector + 3 fretboard regions */}
       <div className="border-t border-dashed border-border/50 pt-2 space-y-2">
         <div className="flex flex-wrap gap-1 items-center min-h-[20px]">
-          {selectedScales.map(scale => (
+          {selectedScales.map((scale) => (
             <span
               key={scale}
               className="inline-flex items-center gap-1 rounded-full bg-primary/15 px-2 py-0.5 text-[9px] font-medium text-primary"
             >
               {scale}
               <button
-                onClick={() => onScalesChange(selectedScales.filter(s => s !== scale))}
+                onClick={() => onScalesChange(selectedScales.filter((s) => s !== scale))}
                 aria-label={`Remover ${scale}`}
                 className="hover:text-destructive"
               >
@@ -330,7 +397,7 @@ export function ImprovisationCard({
           ))}
           <ScaleDropdown
             selectedScales={selectedScales}
-            onAdd={scale => onScalesChange([...selectedScales, scale])}
+            onAdd={(scale) => onScalesChange([...selectedScales, scale])}
           />
         </div>
 

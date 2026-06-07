@@ -132,7 +132,16 @@ export function ProgressionEditor({
     } catch {
       // Ignore storage failures; the editor still works without draft persistence.
     }
-  }, [selectedCategory, selectedTemplate, selectedKey, input, bpm, voicings, chordScales, draftKey]);
+  }, [
+    selectedCategory,
+    selectedTemplate,
+    selectedKey,
+    input,
+    bpm,
+    voicings,
+    chordScales,
+    draftKey,
+  ]);
 
   // Stop playback on unmount
   useEffect(() => {
@@ -377,7 +386,7 @@ export function ProgressionEditor({
           tuning={getActiveTuning()}
           chordScales={chordScales}
           onChordScalesChange={(key, scales) =>
-            setChordScales(prev => ({ ...prev, [key]: scales }))
+            setChordScales((prev) => ({ ...prev, [key]: scales }))
           }
           instrument={instrument}
         />

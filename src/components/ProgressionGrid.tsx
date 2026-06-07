@@ -1,30 +1,39 @@
-import { useMemo, useState } from 'react';
-import type { Measure } from '@/lib/progression';
-import type { HarmonicAnalysis } from '@/lib/harmony';
-import type { Voicing } from '@/lib/chord-finder';
+import { useMemo, useState } from "react";
+import type { Measure } from "@/lib/progression";
+import type { HarmonicAnalysis } from "@/lib/harmony";
+import type { Voicing } from "@/lib/chord-finder";
 import {
   getScaleOptionsForPosition,
   voicingToScalePosition,
   type ScaleOptionResult,
-} from '@/lib/scale-search';
-import { VoicingMiniSvg } from './VoicingMiniSvg';
-import { Popover, PopoverContent, PopoverTrigger } from '@/components/ui/popover';
-import { ImprovisationCard } from './ImprovisationCard';
+} from "@/lib/scale-search";
+import { VoicingMiniSvg } from "./VoicingMiniSvg";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { ImprovisationCard } from "./ImprovisationCard";
 
-interface StoredVoicing extends Voicing { tuning: string[] }
+interface StoredVoicing extends Voicing {
+  tuning: string[];
+}
 
 const FUNC_COLORS: Record<string, string> = {
-  blue:   'bg-blue-100 border-blue-400 text-blue-900 dark:bg-blue-900/30 dark:border-blue-600 dark:text-blue-200',
-  yellow: 'bg-yellow-50 border-yellow-400 text-yellow-900 dark:bg-yellow-900/30 dark:border-yellow-600 dark:text-yellow-200',
-  red:    'bg-red-100 border-red-400 text-red-900 dark:bg-red-900/30 dark:border-red-600 dark:text-red-200',
-  orange: 'bg-orange-100 border-orange-400 text-orange-900 dark:bg-orange-900/30 dark:border-orange-500 dark:text-orange-200',
-  purple: 'bg-purple-100 border-purple-400 text-purple-900 dark:bg-purple-900/30 dark:border-purple-500 dark:text-purple-200',
-  zinc:   'bg-zinc-100 border-zinc-300 text-zinc-700 dark:bg-zinc-800 dark:border-zinc-600 dark:text-zinc-300',
+  blue: "bg-blue-100 border-blue-400 text-blue-900 dark:bg-blue-900/30 dark:border-blue-600 dark:text-blue-200",
+  yellow:
+    "bg-yellow-50 border-yellow-400 text-yellow-900 dark:bg-yellow-900/30 dark:border-yellow-600 dark:text-yellow-200",
+  red: "bg-red-100 border-red-400 text-red-900 dark:bg-red-900/30 dark:border-red-600 dark:text-red-200",
+  orange:
+    "bg-orange-100 border-orange-400 text-orange-900 dark:bg-orange-900/30 dark:border-orange-500 dark:text-orange-200",
+  purple:
+    "bg-purple-100 border-purple-400 text-purple-900 dark:bg-purple-900/30 dark:border-purple-500 dark:text-purple-200",
+  zinc: "bg-zinc-100 border-zinc-300 text-zinc-700 dark:bg-zinc-800 dark:border-zinc-600 dark:text-zinc-300",
 };
 
 const FUNC_BADGE: Record<string, string> = {
-  blue: 'bg-blue-500', yellow: 'bg-yellow-500', red: 'bg-red-500',
-  orange: 'bg-orange-500', purple: 'bg-purple-500', zinc: 'bg-zinc-400',
+  blue: "bg-blue-500",
+  yellow: "bg-yellow-500",
+  red: "bg-red-500",
+  orange: "bg-orange-500",
+  purple: "bg-purple-500",
+  zinc: "bg-zinc-400",
 };
 
 interface Props {
@@ -48,7 +57,13 @@ interface Props {
 
 // ── Voicing Picker Popover ──────────────────────────────────────────────────
 function VoicingPicker({
-  chordName, current, allVoicings, stringCount, markerColor, primaryColor, onSelect,
+  chordName,
+  current,
+  allVoicings,
+  stringCount,
+  markerColor,
+  primaryColor,
+  onSelect,
 }: {
   chordName: string;
   current: StoredVoicing;
@@ -78,7 +93,7 @@ function VoicingPicker({
             height={104}
           />
           <div className="text-[7px] text-center opacity-50 pb-0.5">
-            {current.frets.map(f => f === -1 ? 'X' : f).join(' ')}
+            {current.frets.map((f) => (f === -1 ? "X" : f)).join(" ")}
           </div>
         </button>
       </PopoverTrigger>
@@ -86,25 +101,26 @@ function VoicingPicker({
         className="w-auto max-w-[360px] p-3"
         align="center"
         side="bottom"
-        onClick={e => e.stopPropagation()}
-        onMouseDown={e => e.stopPropagation()}
+        onClick={(e) => e.stopPropagation()}
+        onMouseDown={(e) => e.stopPropagation()}
       >
         <div className="space-y-2">
           <div className="text-sm font-bold">{chordName}</div>
-          <p className="text-[10px] text-muted-foreground">
-            Selecione uma posição diferente:
-          </p>
+          <p className="text-[10px] text-muted-foreground">Selecione uma posição diferente:</p>
           <div className="flex flex-wrap gap-2 max-h-[300px] overflow-y-auto">
             {allVoicings.map((v, i) => {
-              const isSelected = current.frets.join(',') === v.frets.join(',');
+              const isSelected = current.frets.join(",") === v.frets.join(",");
               return (
                 <button
                   key={i}
-                  onClick={() => { onSelect(v); setOpen(false); }}
+                  onClick={() => {
+                    onSelect(v);
+                    setOpen(false);
+                  }}
                   className={`rounded-lg border-2 transition-all hover:scale-105 cursor-pointer bg-white dark:bg-zinc-900 ${
-                    isSelected ? 'border-primary shadow-md scale-105' : 'border-border'
+                    isSelected ? "border-primary shadow-md scale-105" : "border-border"
                   }`}
-                  title={`Traste ${v.startingFret}: ${v.frets.map(f => f === -1 ? 'X' : f).join('-')}`}
+                  title={`Traste ${v.startingFret}: ${v.frets.map((f) => (f === -1 ? "X" : f)).join("-")}`}
                 >
                   <VoicingMiniSvg
                     voicing={v}
@@ -116,7 +132,7 @@ function VoicingPicker({
                     height={110}
                   />
                   <div className="text-[8px] text-center text-muted-foreground pb-1 px-1">
-                    {v.frets.map(f => f === -1 ? 'X' : f).join(' ')}
+                    {v.frets.map((f) => (f === -1 ? "X" : f)).join(" ")}
                   </div>
                 </button>
               );
@@ -130,15 +146,20 @@ function VoicingPicker({
 
 // ── Main Grid ───────────────────────────────────────────────────────────────
 export function ProgressionGrid({
-  measures, analysis, activeMeasure,
-  voicings = {}, stringCount = 6,
-  markerColor = '#000', primaryColor = '#000',
-  getVoicingsForChord, onVoicingSelect,
+  measures,
+  analysis,
+  activeMeasure,
+  voicings = {},
+  stringCount = 6,
+  markerColor = "#000",
+  primaryColor = "#000",
+  getVoicingsForChord,
+  onVoicingSelect,
   showImprovisationOptions = false,
-  tuning = ['D', 'G', 'B', 'D'],
+  tuning = ["D", "G", "B", "D"],
   chordScales = {},
   onChordScalesChange,
-  instrument = 'cavaquinho',
+  instrument = "cavaquinho",
 }: Props) {
   const hasVoicings = Object.keys(voicings).length > 0;
 
@@ -146,7 +167,7 @@ export function ProgressionGrid({
   const scaleOptionsMap = useMemo(() => {
     if (!showImprovisationOptions) return {} as Record<string, ScaleOptionResult[]>;
     const map: Record<string, ScaleOptionResult[]> = {};
-    const chordNames = new Set(measures.flatMap(m => m.beats.map(b => b.chordName)));
+    const chordNames = new Set(measures.flatMap((m) => m.beats.map((b) => b.chordName)));
     for (const chordName of chordNames) {
       const voicing = voicings[chordName];
       if (!voicing) continue;
@@ -176,13 +197,16 @@ export function ProgressionGrid({
           </span>
           <span className="flex gap-1.5 ml-1 flex-wrap">
             {[
-              { color: 'blue',   label: 'T' },
-              { color: 'yellow', label: 'SD' },
-              { color: 'red',    label: 'D' },
-              { color: 'orange', label: 'Dom.Sec' },
-              { color: 'purple', label: 'Modal' },
+              { color: "blue", label: "T" },
+              { color: "yellow", label: "SD" },
+              { color: "red", label: "D" },
+              { color: "orange", label: "Dom.Sec" },
+              { color: "purple", label: "Modal" },
             ].map(({ color, label }) => (
-              <span key={color} className={`rounded px-1.5 py-0.5 text-[9px] font-bold text-white ${FUNC_BADGE[color]}`}>
+              <span
+                key={color}
+                className={`rounded px-1.5 py-0.5 text-[9px] font-bold text-white ${FUNC_BADGE[color]}`}
+              >
                 {label}
               </span>
             ))}
@@ -195,16 +219,19 @@ export function ProgressionGrid({
         {measures.map((measure) => {
           const isActive = activeMeasure === measure.index;
           return (
-            <div key={measure.index}
+            <div
+              key={measure.index}
               className={`rounded-lg border-2 p-2 transition-all bg-card ${
-                isActive ? 'ring-2 ring-primary ring-offset-1 scale-105' : ''
+                isActive ? "ring-2 ring-primary ring-offset-1 scale-105" : ""
               }`}
             >
-              <div className="text-[9px] text-muted-foreground mb-1 font-mono">c.{measure.index + 1}</div>
+              <div className="text-[9px] text-muted-foreground mb-1 font-mono">
+                c.{measure.index + 1}
+              </div>
               <div className="flex gap-1 flex-wrap">
                 {measure.beats.map((beat, bi) => {
                   const a = analysis?.analyses[beat.chordName];
-                  const color = a?.color ?? 'zinc';
+                  const color = a?.color ?? "zinc";
                   const voicing = voicings[beat.chordName];
 
                   // Get all voicings for the picker
@@ -220,7 +247,9 @@ export function ProgressionGrid({
                       instrument={instrument}
                       tuning={tuning}
                       selectedScales={chordScales[`${measure.index}_${bi}`] ?? []}
-                      onScalesChange={scales => onChordScalesChange?.(`${measure.index}_${bi}`, scales)}
+                      onScalesChange={(scales) =>
+                        onChordScalesChange?.(`${measure.index}_${bi}`, scales)
+                      }
                       stringCount={voicing.tuning?.length ?? stringCount}
                       markerColor={markerColor}
                       primaryColor={primaryColor}
@@ -228,9 +257,10 @@ export function ProgressionGrid({
                       beatIndex={bi}
                     />
                   ) : (
-                    <div key={bi}
+                    <div
+                      key={bi}
                       className={`flex-1 min-w-0 rounded border px-1.5 py-1 flex flex-col items-center ${FUNC_COLORS[color]}`}
-                      style={{ minWidth: showImprovisationOptions ? '142px' : '44px' }}
+                      style={{ minWidth: showImprovisationOptions ? "142px" : "44px" }}
                     >
                       {/* Roman numeral */}
                       {a && (
@@ -264,12 +294,12 @@ export function ProgressionGrid({
                                 stringCount={voicing.tuning?.length ?? stringCount}
                                 markerColor={markerColor}
                                 primaryColor={primaryColor}
-                                renderMode={showImprovisationOptions ? 'chord' : 'combined'}
+                                renderMode={showImprovisationOptions ? "chord" : "combined"}
                                 width={58}
                                 height={104}
                               />
                               <div className="text-[7px] text-center opacity-50 pb-0.5">
-                                {voicing.frets.map(f => f === -1 ? 'X' : f).join(' ')}
+                                {voicing.frets.map((f) => (f === -1 ? "X" : f)).join(" ")}
                               </div>
                             </div>
                           ) : (
@@ -326,7 +356,9 @@ export function ProgressionGrid({
                                       height={104}
                                     />
                                     <div className="text-[6.5px] text-center opacity-70 pb-0.5 bg-emerald-100/50 dark:bg-emerald-900/50 truncate max-w-[58px] px-0.5 leading-tight">
-                                      {scale.name.includes("shape") ? scale.name.split("shape")[1].replace(")", "").trim() : scale.name}
+                                      {scale.name.includes("shape")
+                                        ? scale.name.split("shape")[1].replace(")", "").trim()
+                                        : scale.name}
                                     </div>
                                   </button>
                                 </PopoverTrigger>
@@ -343,7 +375,7 @@ export function ProgressionGrid({
                                       {scale.description} {scale.parentScaleName}
                                     </p>
                                     <p className="text-[10px] text-muted-foreground font-mono">
-                                      {scale.noteNames.join(' - ')}
+                                      {scale.noteNames.join(" - ")}
                                     </p>
                                     <span className="inline-block rounded-full bg-emerald-100 px-2 py-0.5 text-[10px] font-bold text-emerald-700 dark:bg-emerald-950 dark:text-emerald-300">
                                       {scale.formLabel}
